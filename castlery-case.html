@@ -1,0 +1,1249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Castlery AU · Growth Case Assessment</title>
+<style>
+  /* ============================================================
+     CASTLERY · GROWTH CASE ASSESSMENT
+     Design language adapted from aurora.html (glass + aurora + diamond cuts)
+     Palette:  primary #844025 · bg #F6F3E7 · accent #778779
+     ============================================================ */
+  :root{
+    /* Brand palette */
+    --primary:#844025;              /* terracotta clay */
+    --primary-2:#A85C3C;            /* lighter clay for gradients */
+    --primary-ink:#5E2C1A;          /* deep clay for text */
+    --bg:#F6F3E7;                   /* warm cream */
+    --bg-2:#EFEAD9;                 /* deeper cream */
+    --sage:#778779;                 /* sage green, minimal use */
+    --sage-2:#8E9C8F;
+
+    /* Neutrals */
+    --ink:#2A231E; --ink-2:#4A3F37; --muted:#8A7E72; --hint:#B2A698;
+    --line:rgba(132,64,37,0.14);
+    --line-soft:rgba(132,64,37,0.08);
+    --card:rgba(255,253,247,0.62);
+    --card-solid:#FFFDF7;
+    --primary-soft:rgba(132,64,37,0.08);
+    --sage-soft:rgba(119,135,121,0.14);
+
+    /* Fortress design tokens (Castlery) with safe fallbacks */
+    --fortress-fontFamily-display:'Reckless','Fraunces',Georgia,'Times New Roman',serif;
+    --fortress-fontFamily-body:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+    --fortress-fontWeight-md:500;
+    --fortress-lineHeight-xs:1.05;
+
+    --display:var(--fortress-fontFamily-display);
+    --sans:var(--fortress-fontFamily-body);
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{
+    margin:0; min-height:100%;
+    font-family:var(--sans); font-weight:400; color:var(--ink);
+    background:var(--bg); -webkit-font-smoothing:antialiased; letter-spacing:0.005em;
+  }
+  ::-webkit-scrollbar{ width:9px } ::-webkit-scrollbar-track{ background:transparent }
+  ::-webkit-scrollbar-thumb{ background:rgba(132,64,37,0.22); border-radius:99px; border:2px solid var(--bg) }
+
+  /* ---------- Aurora backdrop (recolored to palette) ---------- */
+  .aurora{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .blob{ position:absolute; border-radius:50%; filter:blur(90px); opacity:0.4; }
+  .blob-1{ width:560px; height:560px; background:#C98A63; top:-12%; left:-8%; animation:drift1 24s ease-in-out infinite; }
+  .blob-2{ width:620px; height:620px; background:#844025; bottom:-18%; right:-14%; opacity:0.22; animation:drift2 28s ease-in-out infinite; }
+  .blob-3{ width:440px; height:440px; background:#778779; top:40%; left:50%; opacity:0.3; animation:drift3 32s ease-in-out infinite; }
+  .blob-4{ width:380px; height:380px; background:#E3C9A6; top:62%; left:10%; animation:drift1 26s ease-in-out infinite reverse; }
+  @keyframes drift1 { 0%,100%{ transform:translate(0,0) scale(1) } 50%{ transform:translate(60px,-40px) scale(1.1) } }
+  @keyframes drift2 { 0%,100%{ transform:translate(0,0) scale(1) } 50%{ transform:translate(-80px,40px) scale(0.95) } }
+  @keyframes drift3 { 0%,100%{ transform:translate(0,0) scale(1) } 50%{ transform:translate(40px,60px) scale(1.05) } }
+  .grain{ position:fixed; inset:0; z-index:1; pointer-events:none; opacity:0.5;
+    background-image:radial-gradient(circle at 50% 50%, transparent 0, transparent 100%);
+    mix-blend-mode:multiply; }
+
+  /* ---------- Layout shell ---------- */
+  .shell{ position:relative; z-index:2; max-width:1120px; margin:0 auto; padding:48px 22px 120px; }
+  @media (min-width:920px){ .shell{ padding:72px 40px 160px; } }
+
+  /* ---------- Diamond cut marker ---------- */
+  .cut{ display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--primary); }
+  .cut svg{ display:block; }
+  @keyframes slowSpin { from{ transform:rotate(0deg) } to{ transform:rotate(360deg) } }
+  @keyframes rise { 0%{ opacity:0; transform:translateY(20px) } to{ opacity:1; transform:translateY(0) } }
+
+  /* ---------- Masthead ---------- */
+  .masthead{ position:relative; margin-bottom:54px; animation:rise .6s cubic-bezier(.2,.7,.2,1); }
+  .brandline{ display:flex; align-items:center; gap:12px; margin-bottom:26px; }
+  .brandline .mark{ position:relative; width:40px; height:40px; }
+  .brandline .mark .cut{ animation:slowSpin 22s linear infinite; transform-origin:center; }
+  .brandline .mark .ring{ position:absolute; inset:-5px; border-radius:50%; border:1px dashed rgba(132,64,37,0.3); animation:slowSpin 34s linear infinite reverse; }
+  .brandline .kicker{ font-family:var(--sans); font-size:11px; font-weight:500; letter-spacing:0.28em; text-transform:uppercase; color:var(--primary); }
+  .brandline .kicker span{ color:var(--muted); }
+
+  .masthead h1{
+    font-family:var(--display);
+    font-weight:var(--fortress-fontWeight-md);
+    line-height:var(--fortress-lineHeight-xs);
+    letter-spacing:-0.03em;
+    font-size:62px; margin:0; color:var(--ink);
+  }
+  @media (min-width:920px){ .masthead h1{ font-size:92px; } }
+  .masthead h1 em{ font-style:normal; color:var(--primary); }
+  .masthead .dek{ margin-top:22px; max-width:640px; font-size:16px; line-height:1.6; color:var(--ink-2); }
+
+  /* Meta chips */
+  .meta{ display:flex; flex-wrap:wrap; gap:10px; margin-top:28px; }
+  .chip{ display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:999px;
+    background:var(--card); border:1px solid var(--line); backdrop-filter:blur(10px);
+    font-size:12.5px; color:var(--ink-2); font-weight:500; }
+  .chip .dot{ width:7px; height:7px; border-radius:50%; background:var(--sage); }
+  .chip b{ color:var(--primary); font-weight:600; }
+
+  /* ---------- Section scaffold ---------- */
+  section{ margin-top:64px; animation:rise .6s cubic-bezier(.2,.7,.2,1); }
+  .sec-head{ display:flex; align-items:baseline; gap:16px; margin-bottom:24px; }
+  .sec-num{ font-family:var(--display); font-weight:var(--fortress-fontWeight-md);
+    font-size:20px; letter-spacing:-0.03em; color:var(--primary); opacity:0.55;
+    min-width:42px; }
+  .sec-title{ font-family:var(--display); font-weight:var(--fortress-fontWeight-md);
+    line-height:var(--fortress-lineHeight-xs); letter-spacing:-0.03em;
+    font-size:30px; margin:0; color:var(--ink); }
+  @media (min-width:920px){ .sec-title{ font-size:40px; } }
+  .sec-title em{ font-style:normal; color:var(--primary); }
+
+  /* ---------- Glass card ---------- */
+  .glass{ position:relative; background:var(--card); backdrop-filter:blur(26px) saturate(1.3);
+    -webkit-backdrop-filter:blur(26px) saturate(1.3);
+    border:1px solid var(--line); border-radius:22px;
+    box-shadow:0 24px 60px -28px rgba(94,44,26,0.35), inset 0 1px 0 rgba(255,255,255,0.6);
+    padding:28px; }
+  @media (min-width:920px){ .glass{ padding:36px; } }
+
+  /* ---------- Method list ---------- */
+  .method{ display:grid; grid-template-columns:1fr; gap:14px; }
+  @media (min-width:720px){ .method{ grid-template-columns:repeat(3,1fr); } }
+  .method .cell{ padding:18px; border-radius:16px; background:rgba(255,253,247,0.5); border:1px solid var(--line-soft); }
+  .method .cell .k{ font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--sage); font-weight:600; margin-bottom:8px; }
+  .method .cell .v{ font-size:15px; color:var(--ink); line-height:1.5; }
+  .method .cell .v b{ color:var(--primary); font-weight:600; }
+  .scope-list{ margin:22px 0 0; padding:0; list-style:none; display:flex; flex-wrap:wrap; gap:8px; }
+  .scope-list li{ display:inline-flex; align-items:center; gap:7px; padding:7px 13px; border-radius:10px;
+    background:var(--primary-soft); color:var(--primary-ink); font-size:12.5px; font-weight:500; }
+  .scope-list li svg{ color:var(--primary); }
+
+  /* ---------- Scorecard matrix ---------- */
+  .table-wrap{ overflow-x:auto; border-radius:20px; }
+  table.scorecard{ width:100%; border-collapse:separate; border-spacing:0; min-width:720px; }
+  table.scorecard thead th{
+    text-align:left; padding:16px 16px; font-family:var(--sans);
+    font-size:11px; letter-spacing:0.1em; text-transform:uppercase; font-weight:600; color:var(--muted);
+    border-bottom:1.5px solid var(--line); vertical-align:bottom;
+  }
+  table.scorecard thead th.crit{ width:17%; }
+  table.scorecard thead th .ch-ico{ display:block; margin-bottom:8px; color:var(--primary); opacity:0.7; }
+  table.scorecard tbody td{ padding:16px 16px; border-bottom:1px solid var(--line-soft); vertical-align:middle; }
+  table.scorecard tbody tr:last-child td{ border-bottom:none; }
+  table.scorecard tbody tr.brand-row:hover{ background:rgba(132,64,37,0.035); }
+  .brand-cell{ display:flex; align-items:center; gap:12px; }
+  .brand-cell .logo{ width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    font-family:var(--display); font-weight:var(--fortress-fontWeight-md); font-size:16px; color:#fff; letter-spacing:-0.03em; flex:0 0 auto; }
+  .brand-cell .nm{ font-size:15px; font-weight:600; color:var(--ink); }
+  .brand-cell .nm small{ display:block; font-weight:500; font-size:11px; color:var(--muted); letter-spacing:0.02em; margin-top:2px; }
+
+  /* highlight row = Castlery */
+  tr.is-castlery td{ background:rgba(132,64,37,0.06) !important; }
+  tr.is-castlery .brand-cell .nm{ color:var(--primary); }
+
+  /* score pip cell */
+  .score{ display:flex; flex-direction:column; gap:7px; }
+  .pips{ display:flex; gap:4px; }
+  .pip{ width:16px; height:6px; border-radius:3px; background:rgba(132,64,37,0.14); }
+  .pip.on{ background:var(--primary); }
+  .pip.sage.on{ background:var(--sage); }
+  .score .val{ font-family:var(--display); font-weight:var(--fortress-fontWeight-md); letter-spacing:-0.03em;
+    font-size:15px; color:var(--ink-2); }
+  .score .val b{ color:var(--primary); font-size:18px; }
+
+  /* total chip */
+  .total{ display:inline-flex; align-items:baseline; gap:3px; padding:7px 12px; border-radius:10px;
+    font-family:var(--display); letter-spacing:-0.03em; font-weight:var(--fortress-fontWeight-md); }
+  .total b{ font-size:20px; } .total span{ font-size:12px; opacity:0.6; }
+  .total.lead{ background:var(--primary); color:#fff; }
+  .total.strong{ background:var(--sage-soft); color:var(--sage); }
+  .total.mid{ background:var(--primary-soft); color:var(--primary-ink); }
+
+  .legend{ display:flex; flex-wrap:wrap; gap:16px; margin-top:20px; font-size:12px; color:var(--muted); }
+  .legend span{ display:inline-flex; align-items:center; gap:7px; }
+  .legend i{ width:14px; height:6px; border-radius:3px; display:inline-block; }
+
+  /* ---------- Detailed benchmark cards ---------- */
+  .detail-grid{ display:grid; grid-template-columns:1fr; gap:18px; margin-top:22px; }
+  @media (min-width:860px){ .detail-grid{ grid-template-columns:1fr 1fr; } }
+  .bench-card{ position:relative; border-radius:18px; overflow:hidden;
+    background:var(--card); backdrop-filter:blur(20px); border:1px solid var(--line);
+    box-shadow:0 18px 44px -26px rgba(94,44,26,0.3); }
+  .bench-card .top{ display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:16px 20px; border-bottom:1px solid var(--line-soft); }
+  .bench-card .top .brand-cell .logo{ width:34px; height:34px; font-size:15px; }
+  .bench-card ul{ list-style:none; margin:0; padding:8px 20px 18px; }
+  .bench-card li{ padding:13px 0; border-bottom:1px solid var(--line-soft); display:grid; grid-template-columns:1fr auto; gap:6px 14px; align-items:start; }
+  .bench-card li:last-child{ border-bottom:none; }
+  .bench-card li .crit-k{ font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--sage); font-weight:600; }
+  .bench-card li .crit-note{ grid-column:1 / -1; font-size:13.5px; line-height:1.55; color:var(--ink-2); }
+  .mini-pips{ display:flex; gap:3px; align-items:center; }
+  .mini-pips .p{ width:13px; height:5px; border-radius:3px; background:rgba(132,64,37,0.14); }
+  .mini-pips .p.on{ background:var(--primary); }
+  .mini-pips .sc{ margin-left:6px; font-family:var(--display); font-weight:var(--fortress-fontWeight-md); letter-spacing:-0.03em; font-size:13px; color:var(--primary); }
+
+  .bench-card.castlery{ border-color:rgba(132,64,37,0.4); box-shadow:0 22px 54px -24px rgba(132,64,37,0.5); }
+  .bench-card.castlery .top{ background:linear-gradient(180deg, rgba(132,64,37,0.1), transparent); }
+  .ribbon{ font-size:10px; letter-spacing:0.14em; text-transform:uppercase; font-weight:700; color:#fff;
+    background:var(--primary); padding:4px 10px; border-radius:999px; }
+
+  /* ---------- Narrative / observation ---------- */
+  .obs{ display:grid; grid-template-columns:1fr; gap:22px; }
+  @media (min-width:860px){ .obs{ grid-template-columns:1.35fr 1fr; } }
+  .obs .lede{ font-family:var(--display); font-weight:var(--fortress-fontWeight-md);
+    line-height:var(--fortress-lineHeight-xs); letter-spacing:-0.03em; font-size:22px; color:var(--ink); margin:0 0 18px; }
+  @media (min-width:920px){ .obs .lede{ font-size:26px; } }
+  .obs .lede em{ font-style:normal; color:var(--primary); }
+  .obs p{ font-size:15px; line-height:1.68; color:var(--ink-2); margin:0 0 14px; }
+  .obs p b{ color:var(--primary-ink); font-weight:600; }
+
+  .pillars{ display:flex; flex-direction:column; gap:12px; }
+  .pillar{ display:flex; gap:14px; padding:16px; border-radius:14px; background:rgba(255,253,247,0.55); border:1px solid var(--line-soft); }
+  .pillar .ic{ width:34px; height:34px; border-radius:9px; flex:0 0 auto; display:flex; align-items:center; justify-content:center;
+    background:var(--primary-soft); color:var(--primary); }
+  .pillar .bd h4{ margin:0 0 4px; font-size:14px; font-weight:600; color:var(--ink); }
+  .pillar .bd p{ margin:0; font-size:12.5px; line-height:1.5; color:var(--muted); }
+  .pillar.gap .ic{ background:var(--sage-soft); color:var(--sage); }
+  .pillar.gap h4{ color:var(--sage); }
+  .pill-tag{ display:inline-block; margin-top:6px; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase;
+    font-weight:700; padding:3px 9px; border-radius:999px; }
+  .pill-tag.strength{ background:var(--primary-soft); color:var(--primary); }
+  .pill-tag.opp{ background:var(--sage-soft); color:var(--sage); }
+
+  .callout{ margin-top:22px; display:flex; gap:14px; padding:18px 20px; border-radius:16px;
+    background:linear-gradient(180deg, rgba(132,64,37,0.08), rgba(132,64,37,0.03));
+    border:1px solid var(--line); }
+  .callout .ic{ color:var(--primary); flex:0 0 auto; margin-top:2px; }
+  .callout .tx{ font-size:14.5px; line-height:1.6; color:var(--ink-2); }
+  .callout .tx b{ color:var(--primary); font-weight:600; }
+
+  /* ---------- Evidence thumbnails ---------- */
+  .card-shots{ display:flex; gap:8px; padding:14px 20px 0; }
+  .card-shots a{ flex:1; display:block; border-radius:10px; overflow:hidden; border:1px solid var(--line-soft);
+    aspect-ratio:4/3; background:var(--bg-2); }
+  .card-shots img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .4s; }
+  .card-shots a:hover img{ transform:scale(1.06); }
+
+  /* ---------- Journey gallery ---------- */
+  .gallery{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:26px; }
+  @media (min-width:560px){ .gallery{ grid-template-columns:repeat(3,1fr); } }
+  @media (min-width:860px){ .gallery{ grid-template-columns:repeat(6,1fr); } }
+  .gallery figure{ margin:0; border-radius:12px; overflow:hidden; border:1px solid var(--line); background:var(--bg-2);
+    box-shadow:0 10px 26px -18px rgba(94,44,26,0.4); }
+  .gallery a{ display:block; }
+  .gallery img{ width:100%; aspect-ratio:3/4; object-fit:cover; display:block; transition:transform .5s; }
+  .gallery figure:hover img{ transform:scale(1.05); }
+  .gallery figcaption{ font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted);
+    padding:7px 9px; background:rgba(255,253,247,0.6); }
+
+  /* ---------- SCOT matrix ---------- */
+  .scot-intro{ margin:0 0 22px; font-size:14.5px; line-height:1.6; color:var(--muted); max-width:720px; }
+  .scot-intro b{ color:var(--primary); font-weight:600; }
+  .scot-grid{ display:grid; grid-template-columns:1fr; gap:16px; }
+  @media (min-width:780px){ .scot-grid{ grid-template-columns:1fr 1fr; } }
+  .quad{ position:relative; border-radius:18px; overflow:hidden; background:var(--card);
+    border:1px solid var(--line); box-shadow:0 18px 44px -26px rgba(94,44,26,0.3); }
+  .quad .qhead{ display:flex; align-items:center; gap:12px; padding:16px 20px; color:#fff; }
+  .quad .qhead .qic{ width:34px; height:34px; border-radius:9px; background:rgba(255,255,255,0.2);
+    display:flex; align-items:center; justify-content:center; color:#fff; flex:0 0 auto; }
+  .quad .qhead .ql{ font-size:10.5px; letter-spacing:0.18em; text-transform:uppercase; opacity:0.85; font-weight:600; }
+  .quad .qhead h3{ margin:1px 0 0; font-family:var(--display); font-weight:var(--fortress-fontWeight-md);
+    letter-spacing:-0.03em; font-size:22px; line-height:var(--fortress-lineHeight-xs); }
+  .quad .qbody{ padding:14px 20px 20px; }
+  .quad .note{ font-size:11px; color:var(--muted); font-style:italic; margin:0 0 10px; }
+  .quad ul.qlist{ list-style:none; margin:0; padding:0; }
+  .quad ul.qlist li{ position:relative; padding:10px 0 10px 20px; font-size:14px; line-height:1.5; color:var(--ink-2);
+    border-bottom:1px solid var(--line-soft); }
+  .quad ul.qlist li:last-child{ border-bottom:none; }
+  .quad ul.qlist li::before{ content:''; position:absolute; left:0; top:15px; width:8px; height:8px; border-radius:2px;
+    background:var(--q); transform:rotate(45deg); }
+  .quad ul.qlist li b{ color:var(--q-ink); font-weight:600; }
+  .q-strength{ --q:#844025; --q-ink:#5E2C1A; }
+  .q-strength .qhead{ background:linear-gradient(135deg,#9A4E2D,#844025); }
+  .q-challenge{ --q:#B5713E; --q-ink:#8A5327; }
+  .q-challenge .qhead{ background:linear-gradient(135deg,#C4823F,#B5713E); }
+  .q-opp{ --q:#778779; --q-ink:#566656; }
+  .q-opp .qhead{ background:linear-gradient(135deg,#8C9C8D,#778779); }
+  .q-threat{ --q:#8A6D5A; --q-ink:#6B5141; }
+  .q-threat .qhead{ background:linear-gradient(135deg,#9E7E68,#8A6D5A); }
+  .ask{ margin-top:14px; padding:13px 15px; border-radius:12px; background:var(--sage-soft);
+    border:1px dashed rgba(119,135,121,0.45); }
+  .ask .k{ font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--sage); font-weight:700; margin-bottom:7px; }
+  .ask p{ margin:5px 0; font-size:13.5px; color:var(--ink-2); line-height:1.45; }
+  .ask p b{ color:var(--sage); font-weight:600; }
+
+  /* ---------- Part divider ---------- */
+  .part-divider{ display:flex; align-items:center; gap:18px; margin:90px 0 10px; }
+  .part-divider .pd-line{ flex:1; height:1px; background:var(--line); }
+  .part-divider .pd-label{ font-size:11px; letter-spacing:0.3em; text-transform:uppercase; color:var(--primary); font-weight:700; }
+
+  /* ---------- Opportunity cards ---------- */
+  .lead-in{ margin:0 0 22px; font-size:15px; line-height:1.6; color:var(--ink-2); max-width:760px; }
+  .lead-in b{ color:var(--primary); font-weight:600; }
+  .opps{ display:grid; grid-template-columns:1fr; gap:18px; }
+  @media (min-width:820px){ .opps{ grid-template-columns:1fr 1fr; } }
+  .opp{ position:relative; border-radius:18px; padding:24px; background:var(--card); border:1px solid var(--line);
+    box-shadow:0 18px 44px -26px rgba(94,44,26,0.3); }
+  .opp.key{ border-color:rgba(132,64,37,0.4); box-shadow:0 22px 54px -24px rgba(132,64,37,0.45); }
+  .opp .badge{ display:inline-flex; align-items:center; gap:7px; font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase;
+    font-weight:700; padding:5px 11px; border-radius:999px; margin-bottom:14px; }
+  .opp.key .badge{ background:var(--primary); color:#fff; }
+  .opp.quick .badge{ background:var(--sage-soft); color:var(--sage); }
+  .opp h3{ font-family:var(--display); font-weight:var(--fortress-fontWeight-md); letter-spacing:-0.03em;
+    line-height:var(--fortress-lineHeight-xs); font-size:23px; margin:0 0 4px; color:var(--ink); }
+  .opp .sub{ font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); font-weight:600; margin-bottom:14px; }
+  .opp p{ font-size:14px; line-height:1.6; color:var(--ink-2); margin:0 0 14px; }
+  .opp p b{ color:var(--primary-ink); font-weight:600; }
+  .opp .tags{ display:flex; flex-wrap:wrap; gap:7px; }
+  .opp .tags span{ font-size:11.5px; padding:5px 10px; border-radius:8px; background:var(--primary-soft); color:var(--primary-ink); font-weight:500; }
+  .opp.quick .tags span{ background:var(--sage-soft); color:var(--sage); }
+
+  /* score comparison mini-bars */
+  .cmp{ margin:4px 0 16px; display:flex; flex-direction:column; gap:9px; }
+  .cmp .cmp-row{ display:flex; align-items:center; gap:10px; font-size:12px; color:var(--ink-2); }
+  .cmp .cmp-row .nm{ min-width:72px; font-weight:500; }
+  .cmp .cmp-row .track{ flex:1; height:8px; border-radius:99px; background:rgba(132,64,37,0.1); overflow:hidden; }
+  .cmp .cmp-row .fill{ height:100%; border-radius:99px; background:rgba(132,64,37,0.35); }
+  .cmp .cmp-row.me .fill{ background:var(--primary); }
+  .cmp .cmp-row .sc{ min-width:30px; text-align:right; font-weight:600; color:var(--primary); font-variant-numeric:tabular-nums; }
+
+  /* ---------- Mechanism flow ---------- */
+  .mech{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:4px; }
+  .mech .step{ display:flex; align-items:center; gap:9px; padding:12px 15px; border-radius:12px;
+    background:rgba(255,253,247,0.65); border:1px solid var(--line-soft); font-size:13.5px; font-weight:500; color:var(--ink); }
+  .mech .step .ic{ color:var(--primary); flex:0 0 auto; }
+  .mech .arrow{ color:var(--primary); opacity:0.45; }
+  .mech-out{ margin-top:18px; padding:16px 20px; border-radius:14px;
+    background:linear-gradient(135deg, rgba(132,64,37,0.1), rgba(119,135,121,0.08)); border:1px solid var(--line);
+    font-size:14.5px; line-height:1.6; color:var(--ink-2); }
+  .mech-out b{ color:var(--primary); font-weight:600; }
+
+  /* ---------- Model table ---------- */
+  table.model{ width:100%; border-collapse:separate; border-spacing:0; min-width:760px; }
+  table.model thead th{ text-align:right; padding:14px 14px; font-size:10.5px; letter-spacing:0.05em; text-transform:uppercase;
+    font-weight:600; color:var(--muted); border-bottom:1.5px solid var(--line); vertical-align:bottom; }
+  table.model thead th:first-child{ text-align:left; }
+  table.model tbody td{ padding:15px 14px; text-align:right; border-bottom:1px solid var(--line-soft); font-size:14px; color:var(--ink-2);
+    font-variant-numeric:tabular-nums; }
+  table.model tbody td:first-child{ text-align:left; font-weight:600; color:var(--ink); }
+  table.model tbody tr:last-child td{ border-bottom:none; }
+  table.model tr.base-row td{ background:rgba(132,64,37,0.06); }
+  table.model tr.base-row td:first-child{ color:var(--primary); }
+  table.model td .gp{ color:var(--primary); font-weight:600; }
+  .sc-tag{ display:inline-block; font-size:9px; letter-spacing:0.1em; text-transform:uppercase; font-weight:700;
+    padding:2px 8px; border-radius:999px; margin-left:8px; vertical-align:middle; background:var(--primary); color:#fff; }
+
+  /* ---------- Before/after stats ---------- */
+  .stats{ display:grid; grid-template-columns:1fr; gap:14px; }
+  @media (min-width:560px){ .stats{ grid-template-columns:repeat(2,1fr); } }
+  @media (min-width:980px){ .stats{ grid-template-columns:repeat(4,1fr); } }
+  .stat{ padding:18px; border-radius:16px; background:rgba(255,253,247,0.6); border:1px solid var(--line-soft); }
+  .stat .k{ font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--sage); font-weight:600; margin-bottom:12px; }
+  .stat .ba{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
+  .stat .before{ font-size:15px; color:var(--muted); text-decoration:line-through; text-decoration-color:rgba(132,64,37,0.3); }
+  .stat .arr{ color:var(--primary); opacity:0.6; }
+  .stat .after{ font-family:var(--display); font-weight:var(--fortress-fontWeight-md); letter-spacing:-0.03em; font-size:27px; color:var(--primary); }
+  .stat.plain .after{ color:var(--ink); }
+  .stat .delta{ margin-top:10px; display:inline-block; font-size:11px; font-weight:700; padding:3px 9px; border-radius:999px;
+    background:var(--sage-soft); color:var(--sage); letter-spacing:0.02em; }
+
+  /* ---------- Evidence ---------- */
+  .evidence{ display:grid; grid-template-columns:1fr; gap:14px; }
+  @media (min-width:820px){ .evidence{ grid-template-columns:repeat(3,1fr); } }
+  .ev{ padding:22px; border-radius:16px; background:rgba(255,253,247,0.6); border:1px solid var(--line-soft); }
+  .ev .n{ font-family:var(--display); font-weight:var(--fortress-fontWeight-md); letter-spacing:-0.03em; font-size:34px; color:var(--primary); opacity:0.45; line-height:var(--fortress-lineHeight-xs); }
+  .ev p{ margin:12px 0 0; font-size:14px; line-height:1.6; color:var(--ink-2); }
+  .ev p b{ color:var(--primary-ink); font-weight:600; }
+  .ev .src{ margin-top:12px; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--sage); font-weight:700; }
+
+  /* ---------- Measurement framework ---------- */
+  .framework{ display:grid; grid-template-columns:1fr; }
+  .fw-row{ display:grid; grid-template-columns:1fr; gap:6px 24px; padding:16px 0; border-bottom:1px solid var(--line-soft); }
+  @media (min-width:720px){ .fw-row{ grid-template-columns:210px 1fr; } }
+  .fw-row:last-child{ border-bottom:none; }
+  .fw-k{ display:flex; align-items:center; gap:9px; font-size:12px; letter-spacing:0.05em; text-transform:uppercase; color:var(--primary); font-weight:600; }
+  .fw-k .ic{ color:var(--primary); opacity:0.8; flex:0 0 auto; }
+  .fw-v{ font-size:14px; line-height:1.6; color:var(--ink-2); }
+  .fw-v b{ color:var(--primary-ink); font-weight:600; }
+  .fw-v.primary{ font-size:15px; color:var(--ink); font-weight:500; }
+  .pos-neg{ display:inline-flex; flex-wrap:wrap; gap:8px; }
+  .pos-neg .pn{ font-size:12px; padding:4px 10px; border-radius:8px; font-weight:500; }
+  .pn.pos{ background:var(--sage-soft); color:var(--sage); }
+  .pn.neg{ background:var(--primary-soft); color:var(--primary-ink); }
+  .aside-note{ margin-top:20px; display:flex; gap:12px; padding:14px 16px; border-radius:12px;
+    background:rgba(119,135,121,0.08); border:1px dashed rgba(119,135,121,0.4); }
+  .aside-note .ic{ color:var(--sage); flex:0 0 auto; margin-top:1px; }
+  .aside-note p{ margin:0; font-size:12.5px; line-height:1.55; color:var(--muted); font-style:italic; }
+
+  /* ---------- Video call economics ---------- */
+  .vc{ display:grid; grid-template-columns:1fr; gap:22px; }
+  @media (min-width:860px){ .vc{ grid-template-columns:1.1fr 1fr; } }
+  .vc-funnel{ display:flex; flex-direction:column; gap:10px; }
+  .vc-step{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 18px; border-radius:13px;
+    background:rgba(255,253,247,0.6); border:1px solid var(--line-soft); }
+  .vc-step .vl{ font-size:13px; color:var(--ink-2); line-height:1.4; }
+  .vc-step .vl small{ display:block; color:var(--muted); font-size:11px; margin-top:2px; }
+  .vc-step .vn{ font-family:var(--display); font-weight:var(--fortress-fontWeight-md); letter-spacing:-0.03em; font-size:21px; color:var(--primary); white-space:nowrap; }
+  .vc-step.final{ background:linear-gradient(135deg, rgba(132,64,37,0.12), rgba(119,135,121,0.08)); border-color:var(--line); }
+  .vc-step.final .vn{ font-size:24px; }
+  .vc-meta{ display:flex; flex-direction:column; gap:12px; }
+  .vc-fact{ padding:16px 18px; border-radius:14px; background:rgba(255,253,247,0.55); border:1px solid var(--line-soft); }
+  .vc-fact .k{ font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--sage); font-weight:600; margin-bottom:6px; }
+  .vc-fact .v{ font-size:15px; color:var(--ink); line-height:1.5; } .vc-fact .v b{ color:var(--primary); font-weight:600; }
+  .vc-constraint{ padding:16px 18px; border-radius:14px; background:linear-gradient(135deg, rgba(132,64,37,0.1), transparent); border:1px solid var(--line); }
+  .vc-constraint .k{ font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--primary); font-weight:700; margin-bottom:6px; }
+  .vc-constraint p{ margin:0; font-size:13.5px; line-height:1.55; color:var(--ink-2); }
+  .vc-constraint p b{ color:var(--primary); }
+
+  /* ---------- Footer / continuation ---------- */
+  .continues{ margin-top:70px; text-align:center; color:var(--muted); font-size:13px; letter-spacing:0.04em; }
+  .continues .cut{ margin:0 auto 14px; display:flex; opacity:0.6; }
+  .continues .ln{ width:1px; height:40px; background:var(--line); margin:16px auto 0; }
+</style>
+</head>
+<body>
+
+<!-- Furniture icon library (same IDs so all references render furniture) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <!-- Sofa -->
+  <symbol id="cut-round" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 11V8.5A2.5 2.5 0 0 1 7.5 6h9A2.5 2.5 0 0 1 19 8.5V11"/>
+      <path d="M5 11a2 2 0 0 0-2 2v3h18v-3a2 2 0 0 0-2-2 2 2 0 0 0-2 2v.5H7V13a2 2 0 0 0-2-2Z"/>
+      <path d="M5 16v2M19 16v2"/>
+    </g>
+  </symbol>
+  <!-- Armchair -->
+  <symbol id="cut-marquise" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 11V7.5A2.5 2.5 0 0 1 10.5 5h3A2.5 2.5 0 0 1 16 7.5V11"/>
+      <path d="M8 11a2 2 0 0 0-2 2v2h12v-2a2 2 0 0 0-2-2 2 2 0 0 0-2 2H10a2 2 0 0 0-2-2Z"/>
+      <path d="M7 15v3M17 15v3"/>
+    </g>
+  </symbol>
+  <!-- Floor lamp -->
+  <symbol id="cut-emerald" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8.5 10 10 4h4l1.5 6Z"/>
+      <path d="M12 10v8"/>
+      <path d="M9 20h6"/>
+    </g>
+  </symbol>
+  <!-- Coffee table -->
+  <symbol id="cut-princess" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 9h16"/>
+      <path d="M6 9v8M18 9v8"/>
+      <path d="M4 13h16"/>
+    </g>
+  </symbol>
+  <!-- Dining chair -->
+  <symbol id="cut-trillion" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 3v9M16 3v9"/>
+      <path d="M8 6.5h8"/>
+      <path d="M7.5 12h9"/>
+      <path d="M8 12v8M16 12v8"/>
+    </g>
+  </symbol>
+  <!-- Bed -->
+  <symbol id="cut-pear" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 17v-3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3"/>
+      <path d="M3 17h18"/>
+      <path d="M3 14V9M21 17v-3"/>
+      <path d="M7 12v-2a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v2"/>
+    </g>
+  </symbol>
+</svg>
+
+<div class="aurora" aria-hidden="true">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="blob blob-4"></div>
+</div>
+
+<main class="shell">
+
+  <!-- ====================== MASTHEAD ====================== -->
+  <header class="masthead">
+    <div class="brandline">
+      <div class="mark">
+        <span class="cut"><svg width="40" height="40"><use href="#cut-round"/></svg></span>
+        <span class="ring"></span>
+      </div>
+      <div class="kicker">Product Opportunity Research Report</div>
+    </div>
+
+    <p class="dek">
+      A customer-journey-first, PM-lens review of the Castlery AU storefront, benchmarked against four AU furniture retailers.
+    </p>
+
+    <div class="meta">
+      <span class="chip"><span class="dot"></span>Reviewed <b>5&nbsp;Oct&nbsp;2025</b></span>
+      <span class="chip"><span class="dot"></span>Effort <b>~7&nbsp;hours</b></span>
+      <span class="chip"><span class="dot"></span>Market <b>Australia</b></span>
+      <span class="chip"><span class="dot"></span>Benchmark set <b>4&nbsp;competitors</b></span>
+    </div>
+  </header>
+
+  <!-- ====================== 01 · METHOD ====================== -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">01</div>
+      <h2 class="sec-title">Method &amp; <em>scope</em></h2>
+    </div>
+
+    <div class="glass">
+      <div class="method">
+        <div class="cell">
+          <div class="k">Approach</div>
+          <div class="v"><b>Customer-journey-first</b> walkthrough, read through a <b>PM lens</b>.</div>
+        </div>
+        <div class="cell">
+          <div class="k">Subject &amp; date</div>
+          <div class="v">Full-funnel review of <b>Castlery AU</b>, <b>5 October 2025</b>, a <b>~7-hour</b> session.</div>
+        </div>
+        <div class="cell">
+          <div class="k">Benchmark set</div>
+          <div class="v">Benchmarked against <b>Freedom</b>, <b>West&nbsp;Elm</b>, <b>KOALA</b> and <b>IKEA</b> in <b>AU</b>.</div>
+        </div>
+      </div>
+
+      <ul class="scope-list">
+        <li><svg class="cut" width="14" height="14"><use href="#cut-marquise"/></svg>Visual &amp; A+</li>
+        <li><svg class="cut" width="14" height="14"><use href="#cut-marquise"/></svg>Discovery &amp; funnel</li>
+        <li><svg class="cut" width="14" height="14"><use href="#cut-marquise"/></svg>Omnichannel &amp; fulfillment</li>
+        <li><svg class="cut" width="14" height="14"><use href="#cut-marquise"/></svg>Contactability</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ====================== 02 · SCORECARD ====================== -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">02</div>
+      <h2 class="sec-title">Competitive <em>scorecard</em></h2>
+    </div>
+
+    <div class="glass">
+      <div class="table-wrap">
+        <table class="scorecard">
+          <thead>
+            <tr>
+              <th style="width:24%">Brand</th>
+              <th class="crit"><span class="ch-ico cut"><svg width="18" height="18"><use href="#cut-marquise"/></svg></span>Visual &amp; A+</th>
+              <th class="crit"><span class="ch-ico cut"><svg width="18" height="18"><use href="#cut-round"/></svg></span>Discovery &amp; funnel</th>
+              <th class="crit"><span class="ch-ico cut"><svg width="18" height="18"><use href="#cut-emerald"/></svg></span>Omnichannel &amp; fulfillment</th>
+              <th class="crit"><span class="ch-ico cut"><svg width="18" height="18"><use href="#cut-princess"/></svg></span>Contactability</th>
+              <th style="width:12%">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- IKEA -->
+            <tr class="brand-row">
+              <td>
+                <div class="brand-cell">
+                  <div class="logo" style="background:#0058A3">I</div>
+                  <div class="nm">IKEA<small>Benchmark leader</small></div>
+                </div>
+              </td>
+              <td><div class="score"><div class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i></div><div class="val"><b>5</b>/5</div></div></td>
+              <td><div class="score"><div class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i></div><div class="val"><b>5</b>/5</div></div></td>
+              <td><div class="score"><div class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip"></i></div><div class="val"><b>4</b>/5</div></div></td>
+              <td><div class="score"><div class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip"></i><i class="pip"></i></div><div class="val"><b>3</b>/5</div></div></td>
+              <td><span class="total lead"><b>17</b><span>/20</span></span></td>
+            </tr>
+            <!-- Freedom -->
+            <tr class="brand-row">
+              <td>
+                <div class="brand-cell">
+                  <div class="logo" style="background:#2B2B2B">F</div>
+                  <div class="nm">Freedom<small>Content leader</small></div>
+                </div>
+              </td>
+              <td><div class="score"><div class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i></div><div class="val"><b>5</b>/5</div></div></td>
+              <td><div class="score"><div class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip"></i><i class="pip"></i></div><div class="val"><b>3</b>/5</div></div></td>
+              <td><div class="score"><div class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip"></i></div><div class="val"><b>4</b>/5</div></div></td>
+              <td><div class="score"><div class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i></div><div class="val"><b>2</b>/5</div></div></td>
+              <td><span class="total strong"><b>14</b><span>/20</span></span></td>
+            </tr>
+            <!-- West Elm -->
+            <tr class="brand-row">
+              <td>
+                <div class="brand-cell">
+                  <div class="logo" style="background:#4A4A4A">W</div>
+                  <div class="nm">West Elm<small>Design-led</small></div>
+                </div>
+              </td>
+              <td><div class="score"><div class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i></div><div class="val"><b>2</b>/5</div></div></td>
+              <td><div class="score"><div class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip"></i><i class="pip"></i></div><div class="val"><b>3</b>/5</div></div></td>
+              <td><div class="score"><div class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip"></i><i class="pip"></i></div><div class="val"><b>3</b>/5</div></div></td>
+              <td><div class="score"><div class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip"></i><i class="pip"></i></div><div class="val"><b>3</b>/5</div></div></td>
+              <td><span class="total mid"><b>11</b><span>/20</span></span></td>
+            </tr>
+            <!-- KOALA -->
+            <tr class="brand-row">
+              <td>
+                <div class="brand-cell">
+                  <div class="logo" style="background:#1A1A1A">K</div>
+                  <div class="nm">KOALA<small>DTC-native</small></div>
+                </div>
+              </td>
+              <td><div class="score"><div class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i></div><div class="val"><b>2</b>/5</div></div></td>
+              <td><div class="score"><div class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip"></i></div><div class="val"><b>4</b>/5</div></div></td>
+              <td><div class="score"><div class="pips"><i class="pip on"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i></div><div class="val"><b>1</b>/5</div></div></td>
+              <td><div class="score"><div class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i><i class="pip"></i></div><div class="val"><b>4</b>/5</div></div></td>
+              <td><span class="total mid"><b>11</b><span>/20</span></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="legend">
+        <span><i style="background:var(--primary)"></i>Filled pip = 1 point</span>
+        <span><i style="background:var(--primary)"></i>Total badge = category leader</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 03 · DETAILED BENCHMARK ====================== -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">03</div>
+      <h2 class="sec-title">The evidence, <em>brand by brand</em></h2>
+    </div>
+
+    <div class="detail-grid">
+
+      <!-- Freedom -->
+      <article class="bench-card">
+        <div class="top">
+          <div class="brand-cell">
+            <div class="logo" style="background:#2B2B2B">F</div>
+            <div class="nm">Freedom</div>
+          </div>
+          <span class="total strong" style="padding:5px 10px"><b style="font-size:16px">14</b><span>/20</span></span>
+        </div>
+        <div class="card-shots">
+          <a href="freedom1.png" target="_blank"><img src="freedom1.png" alt="Freedom AU storefront 1" loading="lazy"></a>
+          <a href="freedom2.png" target="_blank"><img src="freedom2.png" alt="Freedom AU storefront 2" loading="lazy"></a>
+          <a href="freedom3.png" target="_blank"><img src="freedom3.png" alt="Freedom AU storefront 3" loading="lazy"></a>
+        </div>
+        <ul>
+          <li>
+            <span class="crit-k">Visual &amp; A+</span>
+            <span class="mini-pips"><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p on"></i><span class="sc">5</span></span>
+            <span class="crit-note">Excellent content: 360° views, A+ real-life imagery, reviews with customer images, swatch close-ups and product videos.</span>
+          </li>
+          <li>
+            <span class="crit-k">Discovery &amp; funnel</span>
+            <span class="mini-pips"><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p"></i><i class="p"></i><span class="sc">3</span></span>
+            <span class="crit-note">Held back by low page speeds, no fulfillment filters, and financing options not surfaced on the PDP.</span>
+          </li>
+          <li>
+            <span class="crit-k">Omnichannel &amp; fulfillment</span>
+            <span class="mini-pips"><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p"></i><span class="sc">4</span></span>
+            <span class="crit-note">Delivery within the week, click (pay online) &amp; collect, and find-in-store. A full in-store stock view on the store page is missing, a missed opportunity.</span>
+          </li>
+          <li>
+            <span class="crit-k">Contactability</span>
+            <span class="mini-pips"><i class="p on"></i><i class="p on"></i><i class="p"></i><i class="p"></i><i class="p"></i><span class="sc">2</span></span>
+            <span class="crit-note">Only live chat and query registration; no phone support and no email address available.</span>
+          </li>
+        </ul>
+      </article>
+
+      <!-- West Elm -->
+      <article class="bench-card">
+        <div class="top">
+          <div class="brand-cell">
+            <div class="logo" style="background:#4A4A4A">W</div>
+            <div class="nm">West Elm</div>
+          </div>
+          <span class="total mid" style="padding:5px 10px"><b style="font-size:16px">11</b><span>/20</span></span>
+        </div>
+        <div class="card-shots">
+          <a href="westelm.png" target="_blank"><img src="westelm.png" alt="West Elm AU storefront" loading="lazy"></a>
+          <a href="Westelm1.png" target="_blank"><img src="Westelm1.png" alt="West Elm AU storefront detail" loading="lazy"></a>
+        </div>
+        <ul>
+          <li>
+            <span class="crit-k">Visual &amp; A+</span>
+            <span class="mini-pips"><i class="p on"></i><i class="p on"></i><i class="p"></i><i class="p"></i><i class="p"></i><span class="sc">2</span></span>
+            <span class="crit-note">No reviews, real-life imagery absent, and no product videos.</span>
+          </li>
+          <li>
+            <span class="crit-k">Discovery &amp; funnel</span>
+            <span class="mini-pips"><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p"></i><i class="p"></i><span class="sc">3</span></span>
+            <span class="crit-note">Good filtering and financing (no-cost EMI, BNPL), but low page speeds and no delivery expectations set on the PDP.</span>
+          </li>
+          <li>
+            <span class="crit-k">Omnichannel &amp; fulfillment</span>
+            <span class="mini-pips"><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p"></i><i class="p"></i><span class="sc">3</span></span>
+            <span class="crit-note">Click &amp; collect and find-in-store, but full in-store stock view is missing and online delivery averages ~10 days.</span>
+          </li>
+          <li>
+            <span class="crit-k">Contactability</span>
+            <span class="mini-pips"><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p"></i><i class="p"></i><span class="sc">3</span></span>
+            <span class="crit-note">Live chat, request a free design appointment, query registration and phone support, but no email available.</span>
+          </li>
+        </ul>
+      </article>
+
+      <!-- KOALA -->
+      <article class="bench-card">
+        <div class="top">
+          <div class="brand-cell">
+            <div class="logo" style="background:#1A1A1A">K</div>
+            <div class="nm">KOALA</div>
+          </div>
+          <span class="total mid" style="padding:5px 10px"><b style="font-size:16px">11</b><span>/20</span></span>
+        </div>
+        <div class="card-shots">
+          <a href="Koala%201.png" target="_blank"><img src="Koala%201.png" alt="KOALA AU storefront" loading="lazy"></a>
+        </div>
+        <ul>
+          <li>
+            <span class="crit-k">Visual &amp; A+</span>
+            <span class="mini-pips"><i class="p on"></i><i class="p on"></i><i class="p"></i><i class="p"></i><i class="p"></i><span class="sc">2</span></span>
+            <span class="crit-note">Few or no reviews, real-life imagery absent, and no product videos.</span>
+          </li>
+          <li>
+            <span class="crit-k">Discovery &amp; funnel</span>
+            <span class="mini-pips"><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p"></i><span class="sc">4</span></span>
+            <span class="crit-note">Good filtering and financing (no-cost EMI, BNPL) with good page speeds, but no delivery expectations set on the PDP.</span>
+          </li>
+          <li>
+            <span class="crit-k">Omnichannel &amp; fulfillment</span>
+            <span class="mini-pips"><i class="p on"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><span class="sc">1</span></span>
+            <span class="crit-note">No omnichannel options, and very late online delivery, most often arriving after a month.</span>
+          </li>
+          <li>
+            <span class="crit-k">Contactability</span>
+            <span class="mini-pips"><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p"></i><span class="sc">4</span></span>
+            <span class="crit-note">Live chat, styling assistance, enquiry registration <b>with image upload</b>, and phone support, but no email available.</span>
+          </li>
+        </ul>
+      </article>
+
+      <!-- IKEA -->
+      <article class="bench-card">
+        <div class="top">
+          <div class="brand-cell">
+            <div class="logo" style="background:#0058A3">I</div>
+            <div class="nm">IKEA</div>
+          </div>
+          <span class="total lead" style="padding:5px 10px"><b style="font-size:16px">17</b><span>/20</span></span>
+        </div>
+        <div class="card-shots">
+          <a href="Ikea1.png" target="_blank"><img src="Ikea1.png" alt="IKEA AU storefront" loading="lazy"></a>
+        </div>
+        <ul>
+          <li>
+            <span class="crit-k">Visual &amp; A+</span>
+            <span class="mini-pips"><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p on"></i><span class="sc">5</span></span>
+            <span class="crit-note">All great: visuals, real-life imagery and feature highlights, plus customer UGC within reviews.</span>
+          </li>
+          <li>
+            <span class="crit-k">Discovery &amp; funnel</span>
+            <span class="mini-pips"><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p on"></i><span class="sc">5</span></span>
+            <span class="crit-note">Great filtering and financing, good page speeds, and shop-by-room discovery.</span>
+          </li>
+          <li>
+            <span class="crit-k">Omnichannel &amp; fulfillment</span>
+            <span class="mini-pips"><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p"></i><span class="sc">4</span></span>
+            <span class="crit-note">Delivery within the week, click &amp; collect, and find-in-store. Full in-store stock view on the store page is still missing, a missed opportunity.</span>
+          </li>
+          <li>
+            <span class="crit-k">Contactability</span>
+            <span class="mini-pips"><i class="p on"></i><i class="p on"></i><i class="p on"></i><i class="p"></i><i class="p"></i><span class="sc">3</span></span>
+            <span class="crit-note">Live chat and phone support.</span>
+          </li>
+        </ul>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ====================== 04 · CASTLERY JOURNEY SCAN ====================== -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">04</div>
+      <h2 class="sec-title">Castlery AU <em>journey scan</em></h2>
+    </div>
+
+    <div class="glass">
+      <div class="gallery">
+        <figure><a href="Castlery%201.png" target="_blank"><img src="Castlery%201.png" alt="Castlery AU journey screen 1" loading="lazy"></a><figcaption>Castlery AU · 01</figcaption></figure>
+        <figure><a href="Castlery2.png" target="_blank"><img src="Castlery2.png" alt="Castlery AU journey screen 2" loading="lazy"></a><figcaption>Castlery AU · 02</figcaption></figure>
+        <figure><a href="Castlery3.png" target="_blank"><img src="Castlery3.png" alt="Castlery AU journey screen 3" loading="lazy"></a><figcaption>Castlery AU · 03</figcaption></figure>
+        <figure><a href="Castlery4.png" target="_blank"><img src="Castlery4.png" alt="Castlery AU journey screen 4" loading="lazy"></a><figcaption>Castlery AU · 04</figcaption></figure>
+        <figure><a href="Castlery5.png" target="_blank"><img src="Castlery5.png" alt="Castlery AU journey screen 5" loading="lazy"></a><figcaption>Castlery AU · 05</figcaption></figure>
+        <figure><a href="Castlery%206.png" target="_blank"><img src="Castlery%206.png" alt="Castlery AU journey screen 6" loading="lazy"></a><figcaption>Castlery AU · 06</figcaption></figure>
+      </div>
+      <div class="obs">
+        <div>
+          <p class="lede">Castlery already competes at the <em>top of the market</em> on content and discovery. The gap is <em>omnichannel</em>, not storytelling.</p>
+          <p>
+            The <b>A+ content</b> is excellent and sets product expectations almost at store level: UGC review imagery inside PDPs,
+            the <b>#AtHomewithCastlery</b> gallery on the homepage, product videos, 360° &amp; AR, shape diagrams and swatch close-ups.
+          </p>
+          <p>
+            <b>Discoverability and financing</b> are equally strong, with good page speeds, excellent filters such as <b>Quick-Ship</b>,
+            and financing through no-cost EMI and BNPL.
+          </p>
+          <p>
+            <b>Fulfillment</b> is fairly good, anchored by Quick-Ship availability that delivers in <b>7–15 days</b>. The real gap is the
+            absence of <b>omnichannel enablement</b>: Castlery operates excellent physical stores that are not yet surfaced online,
+            with no find-in-store, no store-stock visibility, no click &amp; collect. Against the benchmark set, this is the single clearest
+            place where leaders (Freedom, IKEA) pull ahead.
+          </p>
+          <p>
+            <b>Contactability</b> is also fairly good, spanning call, live chat, enquiry registration and book-interior-styling, with a clear
+            opportunity to be a <b>first mover</b> on a "schedule a video call" feature.
+          </p>
+
+          <div class="callout">
+            <span class="ic"><svg class="cut" width="22" height="22" style="color:var(--primary)"><use href="#cut-trillion"/></svg></span>
+            <div class="tx"><b>Net read:</b> Castlery is a content and discovery leader with a fulfillment ceiling. Closing the omnichannel gap and owning video-assisted selling are the two highest-leverage moves.</div>
+          </div>
+        </div>
+
+        <div class="pillars">
+          <div class="pillar">
+            <div class="ic"><svg class="cut" width="18" height="18" style="color:var(--primary)"><use href="#cut-marquise"/></svg></div>
+            <div class="bd">
+              <h4>Visual &amp; A+ content</h4>
+              <p>UGC, videos, 360°/AR, shape diagrams, swatch close-ups, near store-level confidence.</p>
+              <span class="pill-tag strength">Strength</span>
+            </div>
+          </div>
+          <div class="pillar">
+            <div class="ic"><svg class="cut" width="18" height="18" style="color:var(--primary)"><use href="#cut-round"/></svg></div>
+            <div class="bd">
+              <h4>Discovery &amp; financing</h4>
+              <p>Good page speeds, Quick-Ship filters, no-cost EMI and BNPL.</p>
+              <span class="pill-tag strength">Strength</span>
+            </div>
+          </div>
+          <div class="pillar gap">
+            <div class="ic"><svg class="cut" width="18" height="18" style="color:var(--sage)"><use href="#cut-emerald"/></svg></div>
+            <div class="bd">
+              <h4>Omnichannel &amp; fulfillment</h4>
+              <p>Quick-Ship 7–15 days is solid, but strong stores are not surfaced online.</p>
+              <span class="pill-tag opp">Opportunity</span>
+            </div>
+          </div>
+          <div class="pillar gap">
+            <div class="ic"><svg class="cut" width="18" height="18" style="color:var(--sage)"><use href="#cut-princess"/></svg></div>
+            <div class="bd">
+              <h4>Contactability</h4>
+              <p>Call, chat, enquiry, styling. Own "schedule a video call" as a first mover.</p>
+              <span class="pill-tag opp">Opportunity</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 05 · SCOT ====================== -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">05</div>
+      <h2 class="sec-title">SCOT <em>analysis</em></h2>
+    </div>
+
+    <div class="glass">
+      <p class="scot-intro">
+        A <b>SCOT</b> lens, not SWOT, and reading the threats box as a set of guardrails for solutioning.
+      </p>
+
+      <div class="scot-grid">
+
+        <!-- Strengths -->
+        <article class="quad q-strength">
+          <div class="qhead">
+            <span class="qic"><svg class="cut" width="18" height="18" style="color:#fff"><use href="#cut-round"/></svg></span>
+            <div><div class="ql">S</div><h3>Strengths</h3></div>
+          </div>
+          <div class="qbody">
+            <ul class="qlist">
+              <li><b>Robust, north-star-driving</b> tech stack and architecture</li>
+              <li><b>A+ content and visuals</b></li>
+              <li><b>User-generated content</b> (UGC)</li>
+              <li><b>Integrated marketing</b> with analytics</li>
+              <li><b>CDP and personalisation</b></li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Challenges -->
+        <article class="quad q-challenge">
+          <div class="qhead">
+            <span class="qic"><svg class="cut" width="18" height="18" style="color:#fff"><use href="#cut-trillion"/></svg></span>
+            <div><div class="ql">C</div><h3>Challenges</h3></div>
+          </div>
+          <div class="qbody">
+            <ul class="qlist">
+              <li><b>CAC is rising</b> (cost to acquire each customer)</li>
+              <li><b>ROAS is declining</b> (return on ad spend)</li>
+              <li><b>95% anonymous users</b>, a large pool of lost leads</li>
+              <li><b>High-consideration</b> purchase segment</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Opportunities -->
+        <article class="quad q-opp">
+          <div class="qhead">
+            <span class="qic"><svg class="cut" width="18" height="18" style="color:#fff"><use href="#cut-marquise"/></svg></span>
+            <div><div class="ql">O</div><h3>Opportunities</h3></div>
+          </div>
+          <div class="qbody">
+            <ul class="qlist">
+              <li><b>Excellence in retail ops &amp; customer service</b>, evidenced by Google reviews and GMB ratings</li>
+              <li>That service excellence can be <b>converted into online conversion</b></li>
+              <li><b>Integration required</b> to bridge in-store service and the digital funnel</li>
+            </ul>
+            <div class="ask">
+              <div class="k">Open questions to scope</div>
+              <p><b>→</b> What is the scope of this opportunity?</p>
+              <p><b>→</b> How do we bring store customer service online?</p>
+            </div>
+          </div>
+        </article>
+
+        <!-- Threats / Guardrails -->
+        <article class="quad q-threat">
+          <div class="qhead">
+            <span class="qic"><svg class="cut" width="18" height="18" style="color:#fff"><use href="#cut-emerald"/></svg></span>
+            <div><div class="ql">T</div><h3>Threats</h3></div>
+          </div>
+          <div class="qbody">
+            <p class="note">Framed as scoping guardrails for solutioning only.</p>
+            <ul class="qlist">
+              <li>Solutions must <b>not be overly complex</b> or unachievable</li>
+              <li><b>Low-hanging fruit preferred</b> for quick wins</li>
+              <li>Avoid <b>heavy re-platforming</b> and long build cycles</li>
+              <li>Respect <b>store-staff bandwidth</b> and operational load</li>
+              <li>Honour <b>data privacy and consent</b> when taking service online</li>
+              <li>Every solution must be <b>measurable against CAC and ROAS</b></li>
+            </ul>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== PART II DIVIDER ====================== -->
+  <div class="part-divider">
+    <span class="pd-line"></span>
+    <span class="pd-label">Part II · Solution</span>
+    <span class="pd-line"></span>
+  </div>
+
+  <!-- ====================== 06 · OPPORTUNITIES ====================== -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">06</div>
+      <h2 class="sec-title">Two <em>opportunities</em></h2>
+    </div>
+
+    <p class="lead-in">
+      Two plays emerge from the <b>scorecard</b> and <b>SCOT</b>: close a proven gap, and claim open whitespace.
+    </p>
+
+    <div class="opps">
+      <!-- Opp 1 -->
+      <article class="opp key">
+        <span class="badge"><svg class="cut" width="13" height="13" style="color:#fff"><use href="#cut-emerald"/></svg>Key lever</span>
+        <h3>Gap bridging</h3>
+        <div class="sub">Omnichannel enablement</div>
+        <p>
+          Castlery's <b>omnichannel &amp; fulfillment</b> trails the benchmark leaders. Closing that gap unlocks uplift in
+          both add-to-carts and conversions, which makes a <b>Base or Optimistic single-digit % uplift</b> credible.
+        </p>
+        <div class="tags">
+          <span>Click &amp; collect</span><span>Find in store</span><span>Store-stock page</span><span>Delivery expectations</span>
+        </div>
+      </article>
+
+      <!-- Opp 2 -->
+      <article class="opp quick">
+        <span class="badge"><svg class="cut" width="13" height="13" style="color:var(--sage)"><use href="#cut-princess"/></svg>Quick win</span>
+        <h3>Whitespace</h3>
+        <div class="sub">Live store video call</div>
+        <p>
+          A live, in-store video call differentiates the brand and pushes the <b>contactability score to the top of the
+          industry</b>. A <b>first mover</b> move, not catch-up. A low-hanging fruit.
+        </p>
+        <div class="tags">
+          <span>Low-hanging fruit</span><span>First mover</span><span>Differentiation</span>
+        </div>
+      </article>
+    </div>
+
+    <div class="callout" style="margin-top:22px">
+      <span class="ic"><svg class="cut" width="22" height="22" style="color:var(--primary)"><use href="#cut-emerald"/></svg></span>
+      <div class="tx"><b>Decision:</b> Omnichannel enablement is the <b>key lever</b>. Live store video call feature can potentially run in parallel as the whitespace play.</div>
+    </div>
+  </section>
+
+  <!-- ====================== 07 · THE LEVER / MECHANISM ====================== -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">07</div>
+      <h2 class="sec-title">The lever: <em>omnichannel enablement</em></h2>
+    </div>
+
+    <div class="glass">
+      <p class="lead-in" style="margin-bottom:18px">Four capabilities, each removing a layer of purchase uncertainty:</p>
+      <div class="mech">
+        <div class="step"><span class="ic"><svg width="18" height="18"><use href="#cut-round"/></svg></span>Click &amp; collect</div>
+        <div class="step"><span class="ic"><svg width="18" height="18"><use href="#cut-marquise"/></svg></span>Find in store</div>
+        <div class="step"><span class="ic"><svg width="18" height="18"><use href="#cut-princess"/></svg></span>Store-stock page</div>
+        <div class="step"><span class="ic"><svg width="18" height="18"><use href="#cut-emerald"/></svg></span>Delivery-expectation setting</div>
+      </div>
+      <div class="mech-out">
+        Together these <b>reduce purchase uncertainty</b>, which lifts <b>ROAS</b> and brings <b>CAC</b> down on the same ad spend.
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 08 · THE MODEL ====================== -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">08</div>
+      <h2 class="sec-title">The <em>model</em></h2>
+    </div>
+
+    <div class="glass">
+      <div class="table-wrap">
+        <table class="model">
+          <thead>
+            <tr>
+              <th>Scenario</th>
+              <th>ATC uplift</th>
+              <th>Order uplift (checkout)</th>
+              <th>New ATC</th>
+              <th>Total orders</th>
+              <th>Extra orders /mo</th>
+              <th>Extra revenue /mo</th>
+              <th>Incremental GP /mo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Conservative</td>
+              <td>3%</td><td>2%</td><td>80,340</td><td>7,310</td><td>350</td>
+              <td>A$626,500</td><td class="gp">A$306,985</td>
+            </tr>
+            <tr class="base-row">
+              <td>Base<span class="sc-tag">Chosen</span></td>
+              <td>6%</td><td>4%</td><td>82,680</td><td>7,670</td><td>710</td>
+              <td>A$1,270,900</td><td class="gp">A$622,741</td>
+            </tr>
+            <tr>
+              <td>Optimistic</td>
+              <td>10%</td><td>7%</td><td>85,800</td><td>8,191</td><td>1,231</td>
+              <td>A$2,203,490</td><td class="gp">A$1,079,710</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="font-family:var(--display); font-weight:var(--fortress-fontWeight-md); letter-spacing:-0.03em; font-size:22px; color:var(--ink); margin:30px 0 6px;">ROAS &amp; CAC effect <span style="color:var(--muted); font-size:14px; font-weight:400;">· on the Base scenario</span></h3>
+      <p class="lead-in" style="margin-bottom:18px">
+        Ad spend is held <b>unchanged at A$1,060,000</b>. Applying the Base order lift of <b>+10.2%</b> to the existing
+        <b>5,824</b> customers lifts volume to <b>6,418</b> on the same budget.
+      </p>
+
+      <div class="stats">
+        <div class="stat plain">
+          <div class="k">Customers / month</div>
+          <div class="ba"><span class="before">5,824</span><span class="arr">→</span><span class="after">6,418</span></div>
+          <span class="delta">+10.2% volume</span>
+        </div>
+        <div class="stat">
+          <div class="k">Effective CAC</div>
+          <div class="ba"><span class="before">A$182</span><span class="arr">→</span><span class="after">A$165</span></div>
+          <span class="delta">−9% cheaper</span>
+        </div>
+        <div class="stat">
+          <div class="k">Gross-profit ROAS</div>
+          <div class="ba"><span class="before">5.76×</span><span class="arr">→</span><span class="after">6.35×</span></div>
+          <span class="delta">+0.59×</span>
+        </div>
+        <div class="stat plain">
+          <div class="k">Marginal GP from lever</div>
+          <div class="ba"><span class="after">+A$622,741</span></div>
+          <span class="delta">per month</span>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:22px">
+        <span class="ic"><svg class="cut" width="22" height="22" style="color:var(--primary)"><use href="#cut-trillion"/></svg></span>
+        <div class="tx">
+          The lever adds <b>A$622,741 in gross profit per month</b> against an expected <b>one-time build of A$30,000</b>
+          for the omnichannel features. That is a <b>payback of well under 3 days</b>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 09 · WHY +10.2% ====================== -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">09</div>
+      <h2 class="sec-title">Why <em>+10.2%</em> is credible</h2>
+    </div>
+
+    <p class="lead-in">Derived from assumptions, professional experience and external evidence.</p>
+
+    <div class="evidence">
+      <div class="ev">
+        <div class="n">01</div>
+        <p>Shoppers are <b>far more likely to buy when local stock is confirmed</b>, and omnichannel buyers spend more once they visit the store through bundling and cross-buying.</p>
+        <div class="src">Assumption + experience</div>
+      </div>
+      <div class="ev">
+        <div class="n">02</div>
+        <p>Omnichannel conversion consistently beats default online. <b>High-consideration purchases need multiple physical brand touchpoints</b>, a pattern I have repeatedly observed.</p>
+        <div class="src">Professional experience</div>
+      </div>
+      <div class="ev">
+        <div class="n">03</div>
+        <p>Per <b>Baymard</b> checkout-UX research, an <b>unclear delivery timeline and cost is a top cart-abandonment driver</b>, and therefore a direct source of lost leads.</p>
+        <div class="src">Baymard Institute</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 10 · MEASUREMENT ====================== -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">10</div>
+      <h2 class="sec-title">How we <em>measure it</em></h2>
+    </div>
+
+    <div class="glass">
+      <div class="framework">
+        <div class="fw-row">
+          <div class="fw-k"><svg class="cut ic" width="16" height="16"><use href="#cut-emerald"/></svg>Primary metric</div>
+          <div class="fw-v primary"><b>Incremental gross profit per 1,000 sessions</b> — only margin-positive profit that would not have happened anyway.</div>
+        </div>
+        <div class="fw-row">
+          <div class="fw-k"><svg class="cut ic" width="16" height="16"><use href="#cut-round"/></svg>Secondary metrics</div>
+          <div class="fw-v">ATC uplift, conversion uplift, and new-customer CAC decrement.</div>
+        </div>
+        <div class="fw-row">
+          <div class="fw-k"><svg class="cut ic" width="16" height="16"><use href="#cut-marquise"/></svg>Guardrails</div>
+          <div class="fw-v">Count <b>net-new orders only</b>; exclude delivery-to-click&amp;collect shifts where the feature simply moves an existing order; monitor <b>staff bandwidth</b> and collect-fulfillment SLA so omnichannel does not degrade showroom service.</div>
+        </div>
+        <div class="fw-row">
+          <div class="fw-k"><svg class="cut ic" width="16" height="16"><use href="#cut-princess"/></svg>Decision unit (grain)</div>
+          <div class="fw-v"><b>Visitor-day</b> for click &amp; collect.</div>
+        </div>
+        <div class="fw-row">
+          <div class="fw-k"><svg class="cut ic" width="16" height="16"><use href="#cut-trillion"/></svg>Target</div>
+          <div class="fw-v">Incremental conversion and revenue.</div>
+        </div>
+        <div class="fw-row">
+          <div class="fw-k"><svg class="cut ic" width="16" height="16"><use href="#cut-pear"/></svg>Attribution window</div>
+          <div class="fw-v"><b>30–45 days</b>.</div>
+        </div>
+        <div class="fw-row">
+          <div class="fw-k"><svg class="cut ic" width="16" height="16"><use href="#cut-round"/></svg>Labels</div>
+          <div class="fw-v"><span class="pos-neg"><span class="pn pos">Positive · omni order placed</span><span class="pn neg">Negative · no omni order</span></span></div>
+        </div>
+        <div class="fw-row">
+          <div class="fw-k"><svg class="cut ic" width="16" height="16"><use href="#cut-marquise"/></svg>Bias risks</div>
+          <div class="fw-v">Consult-bookers are already high-intent, which can <b>overstate expected lift</b>.</div>
+        </div>
+      </div>
+
+      <div class="aside-note">
+        <span class="ic"><svg class="cut" width="18" height="18" style="color:var(--sage)"><use href="#cut-princess"/></svg></span>
+        <p>Field analogy: in restaurants, walk-in customers end up waiting when online-order flux spikes, or low-stock pieces sell out when a reserved live item is being shortlisted offline. The same showroom-service risk applies here, hence the staff-bandwidth guardrail.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 11 · SECOND PLAY: VIDEO CALL ====================== -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">11</div>
+      <h2 class="sec-title">Second play: <em>live store video call</em></h2>
+    </div>
+
+    <div class="glass">
+      <p class="lead-in" style="margin-bottom:22px">
+        A very simple integration with a third party (<b>Poppin</b>) that I have already explored. It costs
+        <b>A$1,000 per month for 2 stores</b>, and integration, setup and training take no more than a week.
+      </p>
+
+      <div class="vc">
+        <div class="vc-funnel">
+          <div class="vc-step"><span class="vl">Video calls / month<small>6 calls per day · per store · 2 stores</small></span><span class="vn">312</span></div>
+          <div class="vc-step"><span class="vl">Conversion at 35%</span><span class="vn">109 orders</span></div>
+          <div class="vc-step"><span class="vl">AOV lift applied<small>+20% vs standard order value</small></span><span class="vn">+20%</span></div>
+          <div class="vc-step final"><span class="vl">Incremental revenue / month</span><span class="vn">A$234,132</span></div>
+        </div>
+
+        <div class="vc-meta">
+          <div class="vc-fact">
+            <div class="k">Monthly cost</div>
+            <div class="v"><b>A$1,000</b> for 2 stores</div>
+          </div>
+          <div class="vc-fact">
+            <div class="k">Time to live</div>
+            <div class="v">Integration, setup &amp; training in <b>under a week</b></div>
+          </div>
+          <div class="vc-fact">
+            <div class="k">Overlap assumption</div>
+            <div class="v">No overlap with other expected orders assumed, given the small order count</div>
+          </div>
+          <div class="vc-constraint">
+            <div class="k">Binding constraint</div>
+            <p>The limit is <b>staff capacity and the quality of video-call training</b>, not money spent.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== CONTINUES ====================== -->
+  <div class="continues">
+    <span class="cut"><svg width="26" height="26"><use href="#cut-pear"/></svg></span>
+    End of document · Castlery AU Product Opportunity Research Report
+    <div class="ln"></div>
+  </div>
+
+</main>
+
+<script>
+  // Reveal sections on scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting){ e.target.style.animationPlayState = 'running'; io.unobserve(e.target); } });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('section').forEach(s => { s.style.animationPlayState = 'paused'; io.observe(s); });
+</script>
+</body>
+</html>
