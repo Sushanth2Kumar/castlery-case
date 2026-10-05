@@ -1,0 +1,108 @@
+%%{init: {"flowchart": {"curve": "basis", "htmlLabels": false}, "theme": "base", "themeVariables": {"primaryColor": "#eef2ff", "primaryBorderColor": "#4f46e5", "primaryTextColor": "#1e1b4b", "lineColor": "#64748b", "fontFamily": "Inter, Arial, sans-serif"}} }%%
+flowchart LR
+
+    subgraph SRC["1. SOURCE"]
+        direction TB
+        POS["Retail POS
+(Oracle)"]
+        OMS["OMS
+(IBM Sterling / ShipRocket)"]
+        CAT["Product Catalog
+(GMC, Enrichment Sheet)"]
+        LOG["Logistics Partner API
+(FarEye)"]
+        GA4["GA4 + Data Layer
+(Google Analytics 4)"]
+        ERP["ERP / Inventory Master
+(SAP)"]
+    end
+
+    subgraph MID["2. MIDDLEWARE / INTEGRATION LAYER"]
+        ETL["iPaaS / ETL
+(MuleSoft)"]
+    end
+
+    subgraph WH["3. WAREHOUSE"]
+        JOIN["Join + Clean
+(Snowflake)"]
+        FALLBACK["Fallback / Last-Good
+Dataset"]
+    end
+
+    subgraph HR["4. HUMAN REVIEW"]
+        REVIEW["Human Review / QA
+(Workflow Tool)"]
+    end
+
+    subgraph ACT["5. ACTIVATION and RETARGETING"]
+        PERS["Personalisation Engine
+on Website
+(Einstein Engine)"]
+        RETGT["Retargeting Audiences
+(MoEngage)"]
+        GMC["GMC Feed
+(Google Merchant Center)"]
+        ADS["Google / Meta Ads"]
+        PDP["PDP / Omnichannel
+Landing Page
+(with Omni features)"]
+    end
+
+    subgraph MON["6. DASHBOARDING and MONITORING"]
+        DASH["Dashboard + Monitoring
+(Looker / Tableau)"]
+    end
+
+    %% Sources -> Middleware
+    POS --> ETL
+    OMS --> ETL
+    CAT --> ETL
+    LOG --> ETL
+    GA4 --> ETL
+    ERP --> ETL
+
+    %% Middleware -> Warehouse
+    ETL --> JOIN
+
+    %% Warehouse -> Human Review
+    JOIN --> REVIEW
+
+    %% Human Review -> Activation
+    REVIEW --> PERS
+    REVIEW --> RETGT
+    REVIEW --> GMC
+
+    %% Warehouse -> Activation (direct real-time path)
+    JOIN -.->|real-time stock / price| PDP
+
+    %% Within Activation
+    ADS <-->|feed mapping| GMC
+    GMC --> PDP
+    RETGT --> PDP
+    PERS --> PDP
+
+    %% Activation -> Monitoring
+    PDP --> DASH
+    GMC --> DASH
+    RETGT --> DASH
+    PERS --> DASH
+
+    %% Failure handling (reverse / fallback paths)
+    JOIN -.->|stale or invalid data| FALLBACK
+    DASH -.->|anomaly flagged| REVIEW
+
+    classDef source fill:#e0f2fe,stroke:#0369a1,stroke-width:1.5px,color:#0c4a6e;
+    classDef mid fill:#fef9c3,stroke:#ca8a04,stroke-width:1.5px,color:#713f12;
+    classDef wh fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d;
+    classDef hr fill:#fee2e2,stroke:#dc2626,stroke-width:1.5px,color:#7f1d1d;
+    classDef act fill:#ede9fe,stroke:#7c3aed,stroke-width:1.5px,color:#4c1d95;
+    classDef mon fill:#ffedd5,stroke:#ea580c,stroke-width:1.5px,color:#7c2d12;
+    classDef fallback fill:#f1f5f9,stroke:#64748b,stroke-width:1.5px,stroke-dasharray: 4 3,color:#334155;
+
+    class POS,OMS,CAT,LOG,GA4,ERP source;
+    class ETL mid;
+    class JOIN wh;
+    class FALLBACK fallback;
+    class REVIEW hr;
+    class PERS,RETGT,GMC,ADS,PDP act;
+    class DASH mon;

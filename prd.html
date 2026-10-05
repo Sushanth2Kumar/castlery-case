@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PRD with Technical Details</title>
+<style>
+  /* ============================================================
+     PRD (design language shared with castlery-case.html)
+     Palette:  primary #844025 · bg #F6F3E7 · accent #778779
+     ============================================================ */
+  :root{
+    --primary:#844025; --primary-2:#A85C3C; --primary-ink:#5E2C1A;
+    --bg:#F6F3E7; --bg-2:#EFEAD9;
+    --sage:#778779; --sage-2:#8E9C8F;
+    --ink:#2A231E; --ink-2:#4A3F37; --muted:#8A7E72; --hint:#B2A698;
+    --line:rgba(132,64,37,0.14); --line-soft:rgba(132,64,37,0.08);
+    --card:rgba(255,253,247,0.62); --card-solid:#FFFDF7;
+    --primary-soft:rgba(132,64,37,0.08); --sage-soft:rgba(119,135,121,0.14);
+
+    --fortress-fontFamily-display:'Reckless','Fraunces',Georgia,'Times New Roman',serif;
+    --fortress-fontFamily-body:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+    --fortress-fontWeight-md:500;
+    --fortress-lineHeight-xs:1.05;
+    --display:var(--fortress-fontFamily-display);
+    --sans:var(--fortress-fontFamily-body);
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; min-height:100%; font-family:var(--sans); font-weight:400; color:var(--ink);
+    background:var(--bg); -webkit-font-smoothing:antialiased; letter-spacing:0.005em; overflow-x:hidden; }
+  ::-webkit-scrollbar{ width:9px } ::-webkit-scrollbar-track{ background:transparent }
+  ::-webkit-scrollbar-thumb{ background:rgba(132,64,37,0.22); border-radius:99px; border:2px solid var(--bg) }
+
+  /* Aurora backdrop */
+  .aurora{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .blob{ position:absolute; border-radius:50%; filter:blur(90px); opacity:0.4; }
+  .blob-1{ width:560px; height:560px; background:#C98A63; top:-12%; left:-8%; animation:drift1 24s ease-in-out infinite; }
+  .blob-2{ width:620px; height:620px; background:#844025; bottom:-18%; right:-14%; opacity:0.22; animation:drift2 28s ease-in-out infinite; }
+  .blob-3{ width:440px; height:440px; background:#778779; top:40%; left:50%; opacity:0.3; animation:drift3 32s ease-in-out infinite; }
+  .blob-4{ width:380px; height:380px; background:#E3C9A6; top:62%; left:10%; animation:drift1 26s ease-in-out infinite reverse; }
+  @keyframes drift1 { 0%,100%{ transform:translate(0,0) scale(1) } 50%{ transform:translate(60px,-40px) scale(1.1) } }
+  @keyframes drift2 { 0%,100%{ transform:translate(0,0) scale(1) } 50%{ transform:translate(-80px,40px) scale(0.95) } }
+  @keyframes drift3 { 0%,100%{ transform:translate(0,0) scale(1) } 50%{ transform:translate(40px,60px) scale(1.05) } }
+
+  .shell{ position:relative; z-index:2; max-width:1120px; margin:0 auto; padding:48px 22px 120px; }
+  @media (min-width:920px){ .shell{ padding:72px 40px 160px; } }
+
+  .cut{ display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--primary); }
+  .cut svg{ display:block; }
+  @keyframes slowSpin { from{ transform:rotate(0deg) } to{ transform:rotate(360deg) } }
+  @keyframes rise { 0%{ opacity:0; transform:translateY(20px) } to{ opacity:1; transform:translateY(0) } }
+
+  /* Masthead */
+  .masthead{ position:relative; margin-bottom:54px; animation:rise .6s cubic-bezier(.2,.7,.2,1); }
+  .brandline{ display:flex; align-items:center; gap:12px; margin-bottom:26px; }
+  .brandline .mark{ position:relative; width:40px; height:40px; }
+  .brandline .mark .cut{ animation:slowSpin 22s linear infinite; transform-origin:center; }
+  .brandline .mark .ring{ position:absolute; inset:-5px; border-radius:50%; border:1px dashed rgba(132,64,37,0.3); animation:slowSpin 34s linear infinite reverse; }
+  .brandline .kicker{ font-family:var(--sans); font-size:11px; font-weight:500; letter-spacing:0.28em; text-transform:uppercase; color:var(--primary); }
+
+  .masthead h1{ font-family:var(--display); font-weight:var(--fortress-fontWeight-md);
+    line-height:var(--fortress-lineHeight-xs); letter-spacing:-0.03em; font-size:52px; margin:0; color:var(--ink); }
+  @media (min-width:920px){ .masthead h1{ font-size:96px; } }
+  .masthead h1 em{ font-style:normal; color:var(--primary); }
+  .masthead .subtitle{ margin-top:10px; font-family:var(--display); font-weight:var(--fortress-fontWeight-md);
+    letter-spacing:-0.02em; font-size:20px; color:var(--primary-ink); }
+  @media (min-width:920px){ .masthead .subtitle{ font-size:26px; } }
+  .masthead .dek{ margin-top:18px; max-width:680px; font-size:16px; line-height:1.6; color:var(--ink-2); }
+
+  .meta{ display:flex; flex-wrap:wrap; gap:10px; margin-top:26px; }
+  .chip{ display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:999px;
+    background:var(--card); border:1px solid var(--line); backdrop-filter:blur(10px);
+    font-size:12.5px; color:var(--ink-2); font-weight:500; }
+  .chip .dot{ width:7px; height:7px; border-radius:50%; background:var(--sage); }
+  .chip b{ color:var(--primary); font-weight:600; }
+
+  /* Section scaffold */
+  section{ margin-top:64px; animation:rise .6s cubic-bezier(.2,.7,.2,1); }
+  .sec-head{ display:flex; align-items:baseline; gap:16px; margin-bottom:24px; }
+  .sec-num{ font-family:var(--display); font-weight:var(--fortress-fontWeight-md); font-size:20px; letter-spacing:-0.03em; color:var(--primary); opacity:0.55; min-width:42px; }
+  .sec-title{ font-family:var(--display); font-weight:var(--fortress-fontWeight-md); line-height:var(--fortress-lineHeight-xs); letter-spacing:-0.03em; font-size:30px; margin:0; color:var(--ink); }
+  @media (min-width:920px){ .sec-title{ font-size:40px; } }
+  .sec-title em{ font-style:normal; color:var(--primary); }
+
+  .glass{ position:relative; background:var(--card); backdrop-filter:blur(26px) saturate(1.3);
+    -webkit-backdrop-filter:blur(26px) saturate(1.3); border:1px solid var(--line); border-radius:22px;
+    box-shadow:0 24px 60px -28px rgba(94,44,26,0.35), inset 0 1px 0 rgba(255,255,255,0.6); padding:28px; }
+  @media (min-width:920px){ .glass{ padding:36px; } }
+
+  .lead-in{ margin:0 0 22px; font-size:15px; line-height:1.6; color:var(--ink-2); max-width:780px; }
+  .lead-in b{ color:var(--primary); font-weight:600; }
+
+  /* Definition rows (overview) */
+  .defs{ display:grid; grid-template-columns:1fr; }
+  .def-row{ display:grid; grid-template-columns:1fr; gap:6px 24px; padding:18px 0; border-bottom:1px solid var(--line-soft); }
+  @media (min-width:720px){ .def-row{ grid-template-columns:190px 1fr; } }
+  .def-row:last-child{ border-bottom:none; }
+  .def-k{ display:flex; align-items:center; gap:9px; font-size:12px; letter-spacing:0.05em; text-transform:uppercase; color:var(--primary); font-weight:600; }
+  .def-k .ic{ color:var(--primary); opacity:0.8; flex:0 0 auto; }
+  .def-v{ font-size:15px; line-height:1.6; color:var(--ink-2); }
+  .def-v b{ color:var(--primary-ink); font-weight:600; }
+
+  /* Generic PRD table */
+  .table-wrap{ overflow-x:auto; border-radius:16px; }
+  table.prd{ width:100%; border-collapse:separate; border-spacing:0; min-width:0; }
+  table.prd.scrollx{ min-width:520px; }
+  table.prd thead th{ text-align:left; padding:14px 16px; font-size:11px; letter-spacing:0.06em; text-transform:uppercase;
+    font-weight:600; color:var(--muted); border-bottom:1.5px solid var(--line); vertical-align:bottom; }
+  table.prd tbody td{ padding:15px 16px; border-bottom:1px solid var(--line-soft); font-size:14px; line-height:1.55; color:var(--ink-2); vertical-align:top; }
+  table.prd tbody tr:last-child td{ border-bottom:none; }
+  table.prd tbody tr:hover td{ background:rgba(132,64,37,0.035); }
+  table.prd td b, table.prd td strong{ color:var(--primary-ink); font-weight:600; }
+  table.prd td .pill{ display:inline-block; font-size:11px; font-weight:600; padding:3px 9px; border-radius:999px; background:var(--primary-soft); color:var(--primary-ink); }
+  table.prd td.mono{ font-family:var(--mono); font-size:12.5px; color:var(--primary-ink); }
+  table.prd td .sage{ color:var(--sage); font-weight:600; }
+
+  /* Scope columns */
+  .cols2{ display:grid; grid-template-columns:1fr; gap:18px; }
+  @media (min-width:820px){ .cols2{ grid-template-columns:1.2fr 1fr; } }
+  .panel{ border-radius:16px; border:1px solid var(--line-soft); background:rgba(255,253,247,0.55); padding:22px; }
+  .panel h4{ margin:0 0 14px; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--sage); font-weight:700; }
+  .panel.neg h4{ color:var(--primary); }
+  .tick-list{ list-style:none; margin:0; padding:0; }
+  .tick-list li{ position:relative; padding:10px 0 10px 28px; font-size:14px; line-height:1.55; color:var(--ink-2); border-bottom:1px solid var(--line-soft); }
+  .tick-list li:last-child{ border-bottom:none; }
+  .tick-list li b{ color:var(--primary-ink); font-weight:600; }
+  .tick-list li::before{ content:''; position:absolute; left:4px; top:15px; width:8px; height:8px; border-radius:2px; background:var(--sage); transform:rotate(45deg); }
+  .tick-list.neg li::before{ background:var(--primary); border-radius:50%; transform:none; width:7px; height:7px; top:16px; left:5px; }
+
+  /* Roadmap timeline */
+  .roadmap{ display:flex; flex-direction:column; gap:14px; }
+  .phase{ display:grid; grid-template-columns:1fr; gap:10px; padding:20px 22px; border-radius:16px; background:rgba(255,253,247,0.6); border:1px solid var(--line-soft); border-left:3px solid var(--primary); }
+  @media (min-width:720px){ .phase{ grid-template-columns:150px 1fr; gap:22px; align-items:start; } }
+  .phase .ph-k{ }
+  .phase .ph-tag{ font-family:var(--display); font-weight:var(--fortress-fontWeight-md); letter-spacing:-0.03em; font-size:22px; color:var(--primary); }
+  .phase .ph-when{ margin-top:2px; font-size:11.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+  .phase .ph-v{ font-size:14px; line-height:1.6; color:var(--ink-2); }
+  .phase .ph-v b{ color:var(--primary-ink); font-weight:600; }
+  .phase.hold{ border-left-color:var(--sage); }
+  .phase.hold .ph-tag{ color:var(--sage); }
+
+  /* Risk cards */
+  .risks{ display:grid; grid-template-columns:1fr; gap:12px; }
+  @media (min-width:720px){ .risks{ grid-template-columns:1fr 1fr; } }
+  .risk{ display:flex; gap:12px; padding:16px 18px; border-radius:14px; background:rgba(255,253,247,0.6); border:1px solid var(--line-soft); }
+  .risk .ic{ color:var(--primary); flex:0 0 auto; margin-top:1px; }
+  .risk p{ margin:0; font-size:13.5px; line-height:1.55; color:var(--ink-2); }
+  .risk p b{ color:var(--primary-ink); font-weight:600; }
+
+  /* Diagram frame */
+  .diagram-frame{ border-radius:18px; border:1px solid var(--line); background:#fff; padding:14px; overflow:auto; box-shadow:0 18px 44px -26px rgba(94,44,26,0.3); }
+  .diagram-frame img{ display:block; width:100%; height:auto; min-width:680px; border-radius:10px; }
+  .diagram-cap{ margin-top:12px; font-size:12px; color:var(--muted); display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; }
+  .diagram-cap .lg{ display:inline-flex; align-items:center; gap:6px; }
+  .diagram-cap i{ width:11px; height:11px; border-radius:3px; display:inline-block; }
+
+  /* Requirement cards */
+  .req-group{ margin-top:14px; }
+  .req-group > .grp-label{ display:inline-flex; align-items:center; gap:9px; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--sage); font-weight:700; margin-bottom:14px; }
+  .reqs{ display:grid; grid-template-columns:1fr; gap:14px; }
+  @media (min-width:820px){ .reqs{ grid-template-columns:1fr 1fr; } }
+  .req{ border-radius:16px; border:1px solid var(--line-soft); background:rgba(255,253,247,0.6); padding:20px; }
+  .req h4{ margin:0 0 8px; font-size:16px; color:var(--ink); font-weight:600; }
+  .req .desc{ font-size:13.5px; line-height:1.55; color:var(--ink-2); margin:0 0 14px; }
+  .req .ac{ display:flex; gap:10px; padding:12px 14px; border-radius:12px; background:var(--primary-soft); }
+  .req .ac .lbl{ font-size:10px; letter-spacing:0.1em; text-transform:uppercase; font-weight:700; color:var(--primary); flex:0 0 auto; margin-top:2px; }
+  .req .ac p{ margin:0; font-size:13px; line-height:1.5; color:var(--primary-ink); }
+
+  /* Metric stats */
+  .stats{ display:grid; grid-template-columns:1fr; gap:14px; }
+  @media (min-width:560px){ .stats{ grid-template-columns:repeat(2,1fr); } }
+  @media (min-width:980px){ .stats{ grid-template-columns:repeat(4,1fr); } }
+  .stat{ padding:20px; border-radius:16px; background:rgba(255,253,247,0.6); border:1px solid var(--line-soft); }
+  .stat .k{ font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--sage); font-weight:600; margin-bottom:12px; }
+  .stat .v{ font-family:var(--display); font-weight:var(--fortress-fontWeight-md); letter-spacing:-0.03em; font-size:30px; color:var(--primary); line-height:1; }
+  .stat .sub{ margin-top:8px; font-size:12px; color:var(--muted); }
+
+  /* Experiment list */
+  .xp{ display:grid; grid-template-columns:1fr; }
+  .xp-row{ display:grid; grid-template-columns:1fr; gap:6px 24px; padding:16px 0; border-bottom:1px solid var(--line-soft); }
+  @media (min-width:720px){ .xp-row{ grid-template-columns:200px 1fr; } }
+  .xp-row:last-child{ border-bottom:none; }
+  .xp-k{ font-size:12px; letter-spacing:0.05em; text-transform:uppercase; color:var(--primary); font-weight:600; }
+  .xp-v{ font-size:14.5px; line-height:1.6; color:var(--ink-2); }
+  .xp-v b{ color:var(--primary-ink); font-weight:600; }
+
+  /* Prompt block */
+  .prompt{ border-radius:16px; border:1px dashed rgba(119,135,121,0.5); background:rgba(119,135,121,0.07); padding:22px; }
+  .prompt .k{ font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--sage); font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+  .prompt pre{ margin:0; white-space:pre-wrap; font-family:var(--mono); font-size:12.5px; line-height:1.6; color:var(--ink-2); }
+
+  .callout{ margin-top:22px; display:flex; gap:14px; padding:18px 20px; border-radius:16px;
+    background:linear-gradient(180deg, rgba(132,64,37,0.08), rgba(132,64,37,0.03)); border:1px solid var(--line); }
+  .callout .ic{ color:var(--primary); flex:0 0 auto; margin-top:2px; }
+  .callout .tx{ font-size:14.5px; line-height:1.6; color:var(--ink-2); }
+  .callout .tx b{ color:var(--primary); font-weight:600; }
+
+  .backlink{ display:inline-flex; align-items:center; gap:8px; margin-top:18px; font-size:13px; color:var(--primary); text-decoration:none; font-weight:600; }
+  .backlink:hover{ text-decoration:underline; }
+
+  .continues{ margin-top:70px; text-align:center; color:var(--muted); font-size:13px; letter-spacing:0.04em; }
+  .continues .cut{ margin:0 auto 14px; display:flex; opacity:0.6; }
+  .continues .ln{ width:1px; height:40px; background:var(--line); margin:16px auto 0; }
+
+  /* ---------- Mobile ---------- */
+  @media (max-width:560px){
+    .shell{ padding:34px 16px 90px; }
+    .masthead{ margin-bottom:38px; }
+    .masthead h1{ font-size:44px; }
+    .masthead .subtitle{ font-size:18px; }
+    .masthead .dek{ font-size:15px; }
+    section{ margin-top:46px; }
+    .sec-head{ gap:10px; margin-bottom:18px; }
+    .sec-num{ min-width:26px; font-size:15px; }
+    .sec-title{ font-size:25px; }
+    .glass{ padding:20px; border-radius:18px; }
+    .lead-in{ font-size:14.5px; }
+    table.prd thead th{ padding:11px 11px; }
+    table.prd tbody td{ padding:12px 11px; font-size:13px; }
+    .def-row,.xp-row{ padding:14px 0; }
+    .panel{ padding:18px; }
+    .phase{ padding:16px 18px; }
+    .req{ padding:16px; }
+    .stat{ padding:16px; }
+    .stat .v{ font-size:26px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Furniture icon library -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="cut-round" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11V8.5A2.5 2.5 0 0 1 7.5 6h9A2.5 2.5 0 0 1 19 8.5V11"/><path d="M5 11a2 2 0 0 0-2 2v3h18v-3a2 2 0 0 0-2-2 2 2 0 0 0-2 2v.5H7V13a2 2 0 0 0-2-2Z"/><path d="M5 16v2M19 16v2"/></g></symbol>
+  <symbol id="cut-marquise" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11V7.5A2.5 2.5 0 0 1 10.5 5h3A2.5 2.5 0 0 1 16 7.5V11"/><path d="M8 11a2 2 0 0 0-2 2v2h12v-2a2 2 0 0 0-2-2 2 2 0 0 0-2 2H10a2 2 0 0 0-2-2Z"/><path d="M7 15v3M17 15v3"/></g></symbol>
+  <symbol id="cut-emerald" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 10 10 4h4l1.5 6Z"/><path d="M12 10v8"/><path d="M9 20h6"/></g></symbol>
+  <symbol id="cut-princess" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16"/><path d="M6 9v8M18 9v8"/><path d="M4 13h16"/></g></symbol>
+  <symbol id="cut-trillion" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v9M16 3v9"/><path d="M8 6.5h8"/><path d="M7.5 12h9"/><path d="M8 12v8M16 12v8"/></g></symbol>
+  <symbol id="cut-pear" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17v-3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3"/><path d="M3 17h18"/><path d="M3 14V9M21 17v-3"/><path d="M7 12v-2a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v2"/></g></symbol>
+</svg>
+
+<div class="aurora" aria-hidden="true">
+  <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div><div class="blob blob-4"></div>
+</div>
+
+<main class="shell">
+
+  <!-- ====================== MASTHEAD ====================== -->
+  <header class="masthead">
+    <div class="brandline">
+      <div class="mark"><span class="cut"><svg width="40" height="40"><use href="#cut-round"/></svg></span><span class="ring"></span></div>
+      <div class="kicker">PRD · with Technical Details</div>
+    </div>
+
+    <div class="subtitle">Omnichannel Landing Experience &amp; Profit-Based Paid Growth</div>
+
+    <p class="dek">
+      Paid traffic lands on pages that prove real local stock, store pickup and accurate delivery, and the profit this
+      creates decides where ad budget goes next, so acquisition compounds profit, not just revenue.
+    </p>
+
+    <div class="meta">
+      <span class="chip"><span class="dot"></span>Track <b>Acquisition engine · ROAS</b></span>
+      <span class="chip"><span class="dot"></span>Decision owned <b>Landing experience + budget allocation</b></span>
+      <span class="chip"><span class="dot"></span>Market <b>Australia</b></span>
+    </div>
+    <a class="backlink" href="index.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to home</a>
+  </header>
+
+  <!-- ====================== 01 · OVERVIEW ====================== -->
+  <section>
+    <div class="sec-head"><div class="sec-num">01</div><h2 class="sec-title">Overview &amp; <em>intent</em></h2></div>
+    <div class="glass">
+      <div class="defs">
+        <div class="def-row">
+          <div class="def-k"><svg class="cut ic" width="16" height="16"><use href="#cut-round"/></svg>Track</div>
+          <div class="def-v"><b>Acquisition engine — ROAS.</b></div>
+        </div>
+        <div class="def-row">
+          <div class="def-k"><svg class="cut ic" width="16" height="16"><use href="#cut-marquise"/></svg>Decision owned</div>
+          <div class="def-v">Which <b>omnichannel experience</b> paid traffic lands on, and which <b>products / geos</b> get paid budget.</div>
+        </div>
+        <div class="def-row">
+          <div class="def-k"><svg class="cut ic" width="16" height="16"><use href="#cut-emerald"/></svg>Vision</div>
+          <div class="def-v">Paid traffic lands on pages that show <b>real local stock, store pickup, and clear, accurate delivery</b>, and the profit this creates decides where ad budget goes next, so acquisition <b>compounds profit instead of just revenue</b>.</div>
+        </div>
+        <div class="def-row">
+          <div class="def-k"><svg class="cut ic" width="16" height="16"><use href="#cut-princess"/></svg>Target user</div>
+          <div class="def-v">The <b>AU shopper arriving via paid search and social</b>, mid-consideration on furniture, who needs confidence a product is good, real, premium yet good value, <b>in-stock, and deliverable</b> before converting.</div>
+        </div>
+        <div class="def-row">
+          <div class="def-k"><svg class="cut ic" width="16" height="16"><use href="#cut-trillion"/></svg>Operators &amp; stakeholders</div>
+          <div class="def-v">Teams that <b>run the system</b> (not who it is for): Performance Marketing, Analytics &amp; Growth, Product Design, Engineering (Frontend / Backend / Data), Retail Systems &amp; Ops, and Logistics / Supply Chain.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 02 · PROBLEM ====================== -->
+  <section>
+    <div class="sec-head"><div class="sec-num">02</div><h2 class="sec-title">The <em>problem</em></h2></div>
+    <div class="glass">
+      <p class="lead-in" style="font-size:16px; max-width:860px; margin:0;">
+        Paid clicks land on PDPs <b>blind to local stock and delivery certainty</b>, and campaigns are optimised on website
+        fulfillment revenue, <b>not leads</b>. As spend scales, <b>marginal ROAS falls</b>. With <b>95% of visitors anonymous</b>,
+        Castlery can't personalise by user; omnichannel enablement reduces that anonymous share, and since Castlery already
+        owns <b>product × geo</b> data, that is the pragmatic axis to optimise on.
+      </p>
+    </div>
+  </section>
+
+  <!-- ====================== 03 · WHY THIS BET ====================== -->
+  <section>
+    <div class="sec-head"><div class="sec-num">03</div><h2 class="sec-title">Why this <em>bet</em>?</h2></div>
+    <div class="glass">
+      <div class="table-wrap">
+        <table class="prd">
+          <thead><tr><th style="width:52%">Signal / evidence</th><th>Implication</th></tr></thead>
+          <tbody>
+            <tr><td>Omnichannel gap vs <b>Freedom / IKEA</b> — no stock view, find-in-store, or click &amp; collect</td><td><b>Build it:</b> proven headroom</td></tr>
+            <tr><td>Omnichannel lift <b>cuts CAC 9%</b> (A$182 → A$165) on the same spend</td><td>A real <span class="sage">profit signal</span> to feed back into paid budget</td></tr>
+            <tr><td>CAC rising, marginal ROAS falling with scale</td><td>Optimise <b>profit-ROAS</b>, not revenue-ROAS</td></tr>
+            <tr><td><b>95% anonymous</b> visitors</td><td>Optimise at <b>product × geo</b>, not user, for better ad performance</td></tr>
+            <tr><td>Delivery clarity reduces cart abandonment <span class="sage">(Baymard)</span></td><td>Delivery, stock &amp; fulfillment info belongs <b>on the landing page itself</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 04 · SCOPE / MVP ====================== -->
+  <section>
+    <div class="sec-head"><div class="sec-num">04</div><h2 class="sec-title">Scope to <em>MVP</em></h2></div>
+    <div class="glass">
+      <div class="cols2">
+        <div class="panel">
+          <h4>Ship first</h4>
+          <ul class="tick-list">
+            <li><b>Landing modules</b> shown to paid traffic: local store stock (find-in-store), click &amp; collect fulfillment, and an <b>exact delivery ETA</b> (a date, not a range).</li>
+            <li><b>Daily profit score per SKU × geo</b>, using stock, margin, returns, and measured omnichannel-enabled lift.</li>
+            <li>Score drives <b>product inclusion</b> (in / out of the paid feed) and <b>budget tilt</b>, both human-approved, not auto-applied.</li>
+            <li><b>Profit-ROAS dashboard.</b></li>
+          </ul>
+        </div>
+        <div class="panel neg">
+          <h4>Non-goals</h4>
+          <ul class="tick-list neg">
+            <li>Replacing <b>Google / Meta bidding algorithms</b> — we feed signals only.</li>
+            <li><b>Full PDP revamp</b> — modular additions only; UI is already optimised.</li>
+            <li><b>Auto-applied budget changes</b> — human approval required in MVP.</li>
+            <li><b>Store video call</b> — a separate initiative, not in this PRD.</li>
+            <li><b>Identity resolution / CDP rebuild.</b></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 05 · ROADMAP ====================== -->
+  <section>
+    <div class="sec-head"><div class="sec-num">05</div><h2 class="sec-title">Roadmap</h2></div>
+    <div class="glass">
+      <div class="roadmap">
+        <div class="phase">
+          <div class="ph-k"><div class="ph-tag">P-1</div><div class="ph-when">Prerequisite · ~6 wks</div></div>
+          <div class="ph-v">Omnichannel enablement build (~2 months of development) plus integration of <b>fulfillment, analytics, marketing cloud and data pipelines</b>. This work overflows into P0.</div>
+        </div>
+        <div class="phase">
+          <div class="ph-k"><div class="ph-tag">P0</div><div class="ph-when">0–2 weeks</div></div>
+          <div class="ph-v">Data joins across <b>stock, margin, returns, store &amp; website</b>; stand up the <b>baseline ROAS report</b>.</div>
+        </div>
+        <div class="phase hold">
+          <div class="ph-k"><div class="ph-tag">P1</div><div class="ph-when">3–6 weeks</div></div>
+          <div class="ph-v">Modules live for paid traffic in <b>test store geos</b>: profit score, inclusion tiers, budget recommendations, dashboard. <b>Holding, no automation.</b></div>
+        </div>
+        <div class="phase">
+          <div class="ph-k"><div class="ph-tag">P2</div><div class="ph-when">7–12 weeks</div></div>
+          <div class="ph-v"><b>Guardrailed budget automation</b>; expand to the next store geos and scale spend in current geos.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 06 · DATA INPUTS ====================== -->
+  <section>
+    <div class="sec-head"><div class="sec-num">06</div><h2 class="sec-title">Data <em>inputs</em></h2></div>
+    <div class="glass">
+      <div class="table-wrap">
+        <table class="prd">
+          <thead><tr><th style="width:32%">Source</th><th>What it provides</th></tr></thead>
+          <tbody>
+            <tr><td><b>Product catalog</b> (GMC feed)</td><td>SKU, price, cost, stock</td></tr>
+            <tr><td><b>Store POS stock</b></td><td>Per-store inventory, mapped to showroom / ecom orders</td></tr>
+            <tr><td><b>Order history</b></td><td>Revenue &amp; returns</td></tr>
+            <tr><td><b>Web analytics</b></td><td>Sessions, conversion by SKU × geo, ATC, checkout, logins, wishlists</td></tr>
+            <tr><td><b>Ad platforms</b></td><td>Spend &amp; clicks, sessions &amp; CX</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 07 · RISKS ====================== -->
+  <section>
+    <div class="sec-head"><div class="sec-num">07</div><h2 class="sec-title">Key <em>risks</em></h2></div>
+    <div class="risks">
+      <div class="risk"><span class="ic"><svg class="cut" width="20" height="20" style="color:var(--primary)"><use href="#cut-emerald"/></svg></span><p><b>Stale / non-updating stock feed</b> showing wrong availability. Mitigation: <b>never show a false claim</b>, suppress the module when data is stale.</p></div>
+      <div class="risk"><span class="ic"><svg class="cut" width="20" height="20" style="color:var(--primary)"><use href="#cut-trillion"/></svg></span><p><b>Concurrent in-store and online orders</b> on the same piece, which can increase bounces.</p></div>
+      <div class="risk"><span class="ic"><svg class="cut" width="20" height="20" style="color:var(--primary)"><use href="#cut-princess"/></svg></span><p><b>Returns lag actual profit.</b> Mitigation: use a <b>trailing 28-day</b> returns estimate.</p></div>
+      <div class="risk"><span class="ic"><svg class="cut" width="20" height="20" style="color:var(--primary)"><use href="#cut-marquise"/></svg></span><p><b>Offline orders not linked</b> to an online SKU / geo, weakening the profit signal.</p></div>
+    </div>
+  </section>
+
+  <!-- ====================== 08 · SCHEMA ====================== -->
+  <section>
+    <div class="sec-head"><div class="sec-num">08</div><h2 class="sec-title">Basic <em>schema</em></h2></div>
+    <div class="glass">
+      <div class="table-wrap">
+        <table class="prd scrollx">
+          <thead><tr><th>Field</th><th>Type</th><th>Source</th><th>Constraint</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">sku_id</td><td>string</td><td>Catalog</td><td>Unique, non-null</td></tr>
+            <tr><td class="mono">geo_store_id</td><td>string</td><td>GMB / POS / manual</td><td>Must match a valid store</td></tr>
+            <tr><td class="mono">date</td><td>date</td><td>Pipeline</td><td>On or before today</td></tr>
+            <tr><td class="mono">store_stock_qty</td><td>int</td><td>POS / vendor</td><td>&ge; 0; <b>null if stale</b></td></tr>
+            <tr><td class="mono">unit_price_aud</td><td>decimal</td><td>Catalog</td><td>&gt; 0</td></tr>
+            <tr><td class="mono">omni_exposure_flag</td><td>boolean</td><td>Analytics</td><td>true / false, non-null</td></tr>
+            <tr><td class="mono">omni_profit_lift</td><td>float</td><td>Model output</td><td>Numeric value</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 09 · SYSTEM FLOW & CFTs ====================== -->
+  <section>
+    <div class="sec-head"><div class="sec-num">09</div><h2 class="sec-title">System flow &amp; <em>CFTs</em></h2></div>
+    <div class="glass">
+      <div class="diagram-frame">
+        <img src="omni-paid-flow-diagram.png" alt="OMNI enablement and paid flow system diagram: Source to Middleware to Warehouse to Human Review to Activation to Dashboarding" loading="lazy">
+      </div>
+      <div class="diagram-cap">
+        <span class="lg"><i style="background:#e0f2fe"></i>Source</span>
+        <span class="lg"><i style="background:#fef9c3"></i>Middleware</span>
+        <span class="lg"><i style="background:#dcfce7"></i>Warehouse</span>
+        <span class="lg"><i style="background:#fee2e2"></i>Human review</span>
+        <span class="lg"><i style="background:#ede9fe"></i>Activation</span>
+        <span class="lg"><i style="background:#ffedd5"></i>Dashboarding</span>
+      </div>
+
+      <h3 style="font-family:var(--display); font-weight:var(--fortress-fontWeight-md); letter-spacing:-0.03em; font-size:22px; color:var(--ink); margin:30px 0 12px;">Cross-functional ownership</h3>
+      <div class="table-wrap">
+        <table class="prd">
+          <thead><tr><th style="width:58%">Workstream</th><th>Owning team</th></tr></thead>
+          <tbody>
+            <tr><td>Google / Meta Ads — performance marketing</td><td><span class="pill">Performance Marketing</span></td></tr>
+            <tr><td>CDP &amp; analytics</td><td><span class="pill">Analytics &amp; Growth</span></td></tr>
+            <tr><td>Personalisation</td><td><span class="pill">Growth</span></td></tr>
+            <tr><td>UI/UX design (stock badges, find-in-store, collect flow, store page, delivery-ETA display)</td><td><span class="pill">Product Design</span></td></tr>
+            <tr><td>Frontend / web development (PDP components, store-page revamp)</td><td><span class="pill">Engineering · Frontend</span></td></tr>
+            <tr><td>Backend / pipeline development (stock sync, scoring service, APIs)</td><td><span class="pill">Engineering · Data &amp; Backend</span></td></tr>
+            <tr><td>Store inventory &amp; POS integration</td><td><span class="pill">Engineering + Retail Systems</span></td></tr>
+            <tr><td>Logistics &amp; delivery-ETA accuracy</td><td><span class="pill">Logistics / Supply Chain</span></td></tr>
+            <tr><td>Store fulfillment &amp; collect operations</td><td><span class="pill">Retail Ops</span></td></tr>
+            <tr><td>QA / testing (functional, data, UI)</td><td><span class="pill">Engineering QA</span></td></tr>
+            <tr><td>Store-staff training &amp; upskilling</td><td><span class="pill">Retail Ops / Enablement</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 10 · REQUIREMENTS & AC ====================== -->
+  <section>
+    <div class="sec-head"><div class="sec-num">10</div><h2 class="sec-title">Requirements &amp; <em>acceptance criteria</em></h2></div>
+
+    <div class="glass">
+      <div class="req-group">
+        <span class="grp-label"><svg class="cut" width="15" height="15" style="color:var(--sage)"><use href="#cut-emerald"/></svg>Omnichannel development</span>
+        <div class="reqs">
+          <div class="req">
+            <h4>Store-stock feed integration</h4>
+            <p class="desc">Sync per-store inventory into the e-com bin at a defined refresh cadence.</p>
+            <div class="ac"><span class="lbl">AC</span><p>Feed updates <b>at least every 3 hours</b>.</p></div>
+          </div>
+          <div class="req">
+            <h4>Find-in-store lookup widget</h4>
+            <p class="desc">From the PDP, a shopper can check which nearby stores carry a given SKU in stock.</p>
+            <div class="ac"><span class="lbl">AC</span><p>Returns the correct store list for a test SKU within SLA response time; when unavailable, shows a <b>"notify me"</b> lead-capture CTA.</p></div>
+          </div>
+          <div class="req">
+            <h4>Click &amp; collect checkout funnel</h4>
+            <p class="desc">Shopper can choose in-store pickup at checkout when local stock exists, with an option to switch to online delivery.</p>
+            <div class="ac"><span class="lbl">AC</span><p>Collect option only appears when <b>store_stock_qty &gt; 0</b> for a reachable store with <b>delivery distance &lt; 100 km</b>.</p></div>
+          </div>
+          <div class="req">
+            <h4>Delivery-expectation display widget</h4>
+            <p class="desc">PDP shows an accurate estimated delivery date per SKU × geo (location auto-fetched or prompted).</p>
+            <div class="ac"><span class="lbl">AC</span><p>Estimate matches logistics SLA by category; falls back to a generic range if SKU-level data is missing or the logistics API fails. <b>Never blank</b>, never leave the user guessing.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="req-group" style="margin-top:28px;">
+        <span class="grp-label"><svg class="cut" width="15" height="15" style="color:var(--sage)"><use href="#cut-round"/></svg>Performance marketing</span>
+        <div class="reqs">
+          <div class="req">
+            <h4>Landing PDP modules</h4>
+            <p class="desc">Shopper sees local stock, a fulfillment option, and delivery ETA on the page they land on.</p>
+            <div class="ac"><span class="lbl">AC</span><p>Modules <b>auto-suppress</b> if stock data is stale.</p></div>
+          </div>
+          <div class="req">
+            <h4>Profit score</h4>
+            <p class="desc">Daily score per SKU × geo, falling back to the category average when data is minimal.</p>
+            <div class="ac"><span class="lbl">AC</span><p>Job <b>completes on schedule</b>.</p></div>
+          </div>
+          <div class="req">
+            <h4>Dashboard</h4>
+            <p class="desc">Profit-ROAS shown alongside revenue-ROAS, with a treatment vs control view.</p>
+            <div class="ac"><span class="lbl">AC</span><p>Updates <b>daily</b>, drillable by SKU / geo.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 11 · METRICS ====================== -->
+  <section>
+    <div class="sec-head"><div class="sec-num">11</div><h2 class="sec-title">Impact <em>metrics</em></h2></div>
+    <div class="glass">
+      <div class="stats">
+        <div class="stat"><div class="k">CAC</div><div class="v">−9%</div><div class="sub">A$182 → A$165, same spend</div></div>
+        <div class="stat"><div class="k">Orders</div><div class="v">+10.2%</div><div class="sub">On the same budget</div></div>
+        <div class="stat"><div class="k">Gross profit</div><div class="v">+A$622k</div><div class="sub">Additional, per month</div></div>
+        <div class="stat"><div class="k">Profit-ROAS (budget feedback)</div><div class="v">+3–6%</div><div class="sub">~A$180k–360k / month</div></div>
+      </div>
+      <div class="callout">
+        <span class="ic"><svg class="cut" width="22" height="22" style="color:var(--primary)"><use href="#cut-trillion"/></svg></span>
+        <div class="tx">The omnichannel lift delivers the first three; <b>feeding that profit signal back into paid budget</b> is expected to add a further <b>+3–6% profit-ROAS</b> (~A$180k–360k / month).</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 12 · EXPERIMENTS ====================== -->
+  <section>
+    <div class="sec-head"><div class="sec-num">12</div><h2 class="sec-title">Experiments &amp; <em>A/B tests</em></h2></div>
+    <div class="glass">
+      <div class="xp">
+        <div class="xp-row"><div class="xp-k">Hypothesis</div><div class="xp-v"><b>Omnichannel landing increases gross profit per dollar spent</b>, without dropping order volume.</div></div>
+        <div class="xp-row"><div class="xp-k">Primary metric</div><div class="xp-v">Incremental <b>gross profit per A$1,000 spend</b>.</div></div>
+        <div class="xp-row"><div class="xp-k">Guardrails</div><div class="xp-v"><b>CAC ceiling.</b></div></div>
+        <div class="xp-row"><div class="xp-k">Run time</div><div class="xp-v"><b>At least 4 weeks</b>, to cover the furniture decision cycle.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== 13 · APPENDIX: AI PROMPT ====================== -->
+  <section>
+    <div class="sec-head"><div class="sec-num">13</div><h2 class="sec-title">Appendix · <em>AI-assisted diagram</em></h2></div>
+    <div class="glass">
+      <p class="lead-in">AI was used to generate the system design diagram above. The exact prompt is recorded below for transparency.</p>
+      <div class="prompt">
+        <div class="k"><svg class="cut" width="15" height="15" style="color:var(--sage)"><use href="#cut-pear"/></svg>Prompt used</div>
+        <pre>Help me with a system diagram for OMNI enablement + Paid flow. For most of the technologies I am giving examples in brackets; for the ones I am missing, please add.
+
+There are 4+ buckets: Source, Middleware / Integration layer, Warehouse, Human Review, Activation, and Dashboarding.
+
+SOURCE — include blocks: Retail POS (Oracle), OMS (IBM Sterling / ShipRocket), Product Catalog (GMC, Enrichment Sheet), Logistics Partner API (FarEye), GA4 + Data Layer, ERP / Inventory Master (SAP).
+MIDDLEWARE — iPaaS / ETL (MuleSoft).
+WAREHOUSE — Join + Clean (Snowflake), Fallback / Last-Good dataset.
+HUMAN REVIEW — Human Review / QA (Workflow Tool).
+ACTIVATION & RETARGETING — Personalisation Engine on website (Einstein Engine), Retargeting Audiences (MoEngage), GMC Feed (Google Merchant Center), Google / Meta Ads, PDP (with omni features).
+DASHBOARDING & MONITORING — Dashboard + Monitoring (Looker / Tableau).
+
+Flows:
+Sources → Middleware: Retail POS / OMS / Product Catalog / Logistics API / GA4 / ERP → iPaaS/ETL
+Middleware → Warehouse: iPaaS/ETL → Join + Clean
+Warehouse → Human Review: Join + Clean → Human Review
+Human Review → Activation: → Personalisation, → Retargeting, → GMC Feed
+Warehouse → Activation (real-time): Join + Clean ⇢ PDP (real-time stock / price)
+Within Activation: Google/Meta Ads ⇄ GMC Feed (feed mapping); GMC / Retargeting / Personalisation → PDP
+Activation → Monitoring: PDP / GMC / Retargeting / Personalisation → Dashboard
+Failure handling (reverse arrows): Join + Clean ⇢ Fallback/Last-Good (stale/invalid data); Dashboard ⇢ Human Review (anomaly flagged).</pre>
+      </div>
+    </div>
+  </section>
+
+  <div class="continues">
+    <span class="cut"><svg width="26" height="26"><use href="#cut-pear"/></svg></span>
+    End of PRD
+    <div class="ln"></div>
+  </div>
+
+</main>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting){ e.target.style.animationPlayState = 'running'; io.unobserve(e.target); } });
+  }, { threshold: 0.06 });
+  document.querySelectorAll('section').forEach(s => { s.style.animationPlayState = 'paused'; io.observe(s); });
+</script>
+</body>
+</html>
