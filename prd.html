@@ -4,19 +4,20 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>PRD with Technical Details</title>
+<link rel="icon" href="data:," />
 <style>
   /* ============================================================
      PRD (design language shared with castlery-case.html)
      Palette:  primary #844025 · bg #F6F3E7 · accent #778779
      ============================================================ */
   :root{
-    --primary:#844025; --primary-2:#A85C3C; --primary-ink:#5E2C1A;
-    --bg:#F6F3E7; --bg-2:#EFEAD9;
-    --sage:#778779; --sage-2:#8E9C8F;
-    --ink:#2A231E; --ink-2:#4A3F37; --muted:#8A7E72; --hint:#B2A698;
+    --primary:#844025; --primary-ink:#5E2C1A;
+    --bg:#F6F3E7;
+    --sage:#778779;
+    --ink:#2A231E; --ink-2:#4A3F37; --muted:#8A7E72;
     --line:rgba(132,64,37,0.14); --line-soft:rgba(132,64,37,0.08);
-    --card:rgba(255,253,247,0.62); --card-solid:#FFFDF7;
-    --primary-soft:rgba(132,64,37,0.08); --sage-soft:rgba(119,135,121,0.14);
+    --card:rgba(255,253,247,0.62);
+    --primary-soft:rgba(132,64,37,0.08);
 
     --fortress-fontFamily-display:'Reckless','Fraunces',Georgia,'Times New Roman',serif;
     --fortress-fontFamily-body:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
@@ -34,7 +35,7 @@
 
   /* Aurora backdrop */
   .aurora{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
-  .blob{ position:absolute; border-radius:50%; filter:blur(90px); opacity:0.4; }
+  .blob{ position:absolute; border-radius:50%; filter:blur(90px); opacity:0.4; will-change:transform; }
   .blob-1{ width:560px; height:560px; background:#C98A63; top:-12%; left:-8%; animation:drift1 24s ease-in-out infinite; }
   .blob-2{ width:620px; height:620px; background:#844025; bottom:-18%; right:-14%; opacity:0.22; animation:drift2 28s ease-in-out infinite; }
   .blob-3{ width:440px; height:440px; background:#778779; top:40%; left:50%; opacity:0.3; animation:drift3 32s ease-in-out infinite; }
@@ -195,9 +196,6 @@
   .callout .ic{ color:var(--primary); flex:0 0 auto; margin-top:2px; }
   .callout .tx{ font-size:14.5px; line-height:1.6; color:var(--ink-2); }
   .callout .tx b{ color:var(--primary); font-weight:600; }
-
-  .backlink{ display:inline-flex; align-items:center; gap:8px; margin-top:18px; font-size:13px; color:var(--primary); text-decoration:none; font-weight:600; }
-  .backlink:hover{ text-decoration:underline; }
 
   .continues{ margin-top:70px; text-align:center; color:var(--muted); font-size:13px; letter-spacing:0.04em; }
   .continues .cut{ margin:0 auto 14px; display:flex; opacity:0.6; }
@@ -440,7 +438,7 @@
     <div class="sec-head"><div class="sec-num">09</div><h2 class="sec-title">System flow &amp; <em>CFTs</em></h2></div>
     <div class="glass">
       <div class="diagram-frame">
-        <img src="omni-paid-flow-diagram.png" alt="OMNI enablement and paid flow system diagram: Source to Middleware to Warehouse to Human Review to Activation to Dashboarding" loading="lazy">
+        <img src="omni-paid-flow-diagram.png" width="2352" height="804" decoding="async" alt="OMNI enablement and paid flow system diagram: Source to Middleware to Warehouse to Human Review to Activation to Dashboarding" loading="lazy">
       </div>
       <div class="diagram-cap">
         <span class="lg"><i style="background:#e0f2fe"></i>Source</span>
