@@ -338,7 +338,7 @@
           <h4>Ship first</h4>
           <ul class="tick-list">
             <li><b>Landing modules</b> shown to paid traffic: local store stock (find-in-store), click &amp; collect fulfillment, and an <b>exact delivery ETA</b> (a date, not a range).</li>
-            <li><b>Daily profit score per SKU × geo</b>, using stock, margin, returns, and measured omnichannel-enabled lift.</li>
+            <li><b>Profit score per SKU × geo, refreshed every 3 hrs</b>, using stock, margin, returns, and measured omnichannel-enabled lift.</li>
             <li>Score drives <b>product inclusion</b> (in / out of the paid feed) and <b>budget tilt</b>, both human-approved, not auto-applied.</li>
             <li><b>Profit-ROAS dashboard.</b></li>
           </ul>
@@ -405,9 +405,9 @@
   <section>
     <div class="sec-head"><div class="sec-num">07</div><h2 class="sec-title">Key <em>risks</em></h2></div>
     <div class="risks">
-      <div class="risk"><span class="ic"><svg class="cut" width="20" height="20" style="color:var(--primary)"><use href="#cut-emerald"/></svg></span><p><b>Stale / non-updating stock feed</b> showing wrong availability. Mitigation: <b>never show a false claim</b>, suppress the module when data is stale.</p></div>
-      <div class="risk"><span class="ic"><svg class="cut" width="20" height="20" style="color:var(--primary)"><use href="#cut-trillion"/></svg></span><p><b>Concurrent in-store and online orders</b> on the same piece, which can increase bounces.</p></div>
-      <div class="risk"><span class="ic"><svg class="cut" width="20" height="20" style="color:var(--primary)"><use href="#cut-princess"/></svg></span><p><b>Returns lag actual profit.</b> Mitigation: use a <b>trailing 28-day</b> returns estimate.</p></div>
+      <div class="risk"><span class="ic"><svg class="cut" width="20" height="20" style="color:var(--primary)"><use href="#cut-emerald"/></svg></span><p><b>Stale / non-updating stock feed</b> showing wrong availability. Mitigation: <b>never show non-updated stock; always do real-time inventory sync</b>, suppress the module when data is stale. Use webhooks and push APIs.</p></div>
+      <div class="risk"><span class="ic"><svg class="cut" width="20" height="20" style="color:var(--primary)"><use href="#cut-trillion"/></svg></span><p><b>Concurrent in-store and online orders</b> on the same piece, which can increase website bounces and in-store customer disappointment.</p></div>
+      <div class="risk"><span class="ic"><svg class="cut" width="20" height="20" style="color:var(--primary)"><use href="#cut-princess"/></svg></span><p><b>Returns lag actual profit.</b> Mitigation: use a <b>trailing 30-day</b> returns estimate.</p></div>
       <div class="risk"><span class="ic"><svg class="cut" width="20" height="20" style="color:var(--primary)"><use href="#cut-marquise"/></svg></span><p><b>Offline orders not linked</b> to an online SKU / geo, weakening the profit signal.</p></div>
     </div>
   </section>
@@ -427,6 +427,8 @@
             <tr><td class="mono">unit_price_aud</td><td>decimal</td><td>Catalog</td><td>&gt; 0</td></tr>
             <tr><td class="mono">omni_exposure_flag</td><td>boolean</td><td>Analytics</td><td>true / false, non-null</td></tr>
             <tr><td class="mono">omni_profit_lift</td><td>float</td><td>Model output</td><td>Numeric value</td></tr>
+            <tr><td class="mono">OrderPlaced</td><td>event</td><td>OMS</td><td>Triggers stock deduction &amp; allocation</td></tr>
+            <tr><td class="mono">StockReceived</td><td>event</td><td>POS / ERP</td><td>Updates <span class="mono">store_stock_qty</span> in real time</td></tr>
           </tbody>
         </table>
       </div>
@@ -481,8 +483,8 @@
         <div class="reqs">
           <div class="req">
             <h4>Store-stock feed integration</h4>
-            <p class="desc">Sync per-store inventory into the e-com bin at a defined refresh cadence.</p>
-            <div class="ac"><span class="lbl">AC</span><p>Feed updates <b>at least every 3 hours</b>.</p></div>
+            <p class="desc">Sync per-store inventory into the e-com bin.</p>
+            <div class="ac"><span class="lbl">AC</span><p><b>Real-time inventory sync</b>: stock deduction &amp; allocation. Stock updates within <b>&lt; 500 ms</b> of the payment initiation step, not order creation.</p></div>
           </div>
           <div class="req">
             <h4>Find-in-store lookup widget</h4>
@@ -497,7 +499,12 @@
           <div class="req">
             <h4>Delivery-expectation display widget</h4>
             <p class="desc">PDP shows an accurate estimated delivery date per SKU × geo (location auto-fetched or prompted).</p>
-            <div class="ac"><span class="lbl">AC</span><p>Estimate matches logistics SLA by category; falls back to a generic range if SKU-level data is missing or the logistics API fails. <b>Never blank</b>, never leave the user guessing.</p></div>
+            <div class="ac"><span class="lbl">AC</span><p>Estimate matches logistics SLA by category; falls back to a generic range observed by predictive analytics if SKU-level data is missing or the logistics API fails. <b>Never blank</b>, never leave the user guessing when the product would reach them while it shows in stock and ATC is available.</p></div>
+          </div>
+          <div class="req">
+            <h4>Landing PDP modules</h4>
+            <p class="desc">Shopper sees local stock, a fulfillment option, and delivery ETA on the page they land on.</p>
+            <div class="ac"><span class="lbl">AC</span><p>Modules <b>auto-suppress</b> if stock data is stale.</p></div>
           </div>
         </div>
       </div>
@@ -506,19 +513,14 @@
         <span class="grp-label"><svg class="cut" width="15" height="15" style="color:var(--sage)"><use href="#cut-round"/></svg>Performance marketing</span>
         <div class="reqs">
           <div class="req">
-            <h4>Landing PDP modules</h4>
-            <p class="desc">Shopper sees local stock, a fulfillment option, and delivery ETA on the page they land on.</p>
-            <div class="ac"><span class="lbl">AC</span><p>Modules <b>auto-suppress</b> if stock data is stale.</p></div>
-          </div>
-          <div class="req">
             <h4>Profit score</h4>
-            <p class="desc">Daily score per SKU × geo, falling back to the category average when data is minimal.</p>
+            <p class="desc">Score per SKU × geo, refreshed every 3 hrs, falling back to the category average when data is minimal.</p>
             <div class="ac"><span class="lbl">AC</span><p>Job <b>completes on schedule</b>.</p></div>
           </div>
           <div class="req">
             <h4>Dashboard</h4>
             <p class="desc">Profit-ROAS shown alongside revenue-ROAS, with a treatment vs control view.</p>
-            <div class="ac"><span class="lbl">AC</span><p>Updates <b>daily</b>, drillable by SKU / geo.</p></div>
+            <div class="ac"><span class="lbl">AC</span><p>Updates <b>every 3 hrs</b>, drillable by SKU / geo.</p></div>
           </div>
         </div>
       </div>
@@ -544,7 +546,7 @@
 
   <!-- ====================== 12 · EXPERIMENTS ====================== -->
   <section>
-    <div class="sec-head"><div class="sec-num">12</div><h2 class="sec-title">Experiments &amp; <em>A/B tests</em></h2></div>
+    <div class="sec-head"><div class="sec-num">12</div><h2 class="sec-title">Experiments</h2></div>
     <div class="glass">
       <div class="xp">
         <div class="xp-row"><div class="xp-k">Hypothesis</div><div class="xp-v"><b>Omnichannel landing increases gross profit per dollar spent</b>, without dropping order volume.</div></div>
